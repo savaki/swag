@@ -29,7 +29,7 @@ type Endpoint struct {
 	HandlerFunc http.HandlerFunc
 	Produces    []string
 	Consumes    []string
-	Parameter   *Parameter
+	Parameters  []Parameter
 	Responses   map[int]Response
 
 	// Value is a container for arbitrary content to provide support for non net/http web frameworks

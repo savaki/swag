@@ -68,7 +68,7 @@ func (api *Api) initSchema(v interface{}) *SwaggerSchema {
 	return schema
 }
 
-func (api *Api) initParameter(parameter *Parameter) SwaggerParameter {
+func (api *Api) initParameter(parameter Parameter) SwaggerParameter {
 	p := SwaggerParameter{
 		In:          parameter.In,
 		Name:        parameter.Name,
@@ -123,9 +123,9 @@ func (api *Api) initEndpoint(endpoint Endpoint) *SwaggerEndpoint {
 	}
 
 	// handle the parameters
-	if endpoint.Parameter != nil {
+	if endpoint.Parameters != nil && len(endpoint.Parameters) == 1 {
 		se.Parameters = []SwaggerParameter{
-			api.initParameter(endpoint.Parameter),
+			api.initParameter(endpoint.Parameters[0]),
 		}
 	}
 
@@ -145,8 +145,8 @@ func (api *Api) initDefinitions() map[string]Object {
 
 	// collect all the objects from all the endpoints
 	for _, endpoint := range api.Endpoints {
-		if endpoint.Parameter != nil && endpoint.Parameter.Schema != nil {
-			objects = append(objects, endpoint.Parameter.Schema)
+		if endpoint.Parameters != nil && len(endpoint.Parameters) == 1 && endpoint.Parameters[0].Schema != nil {
+			objects = append(objects, endpoint.Parameters[0].Schema)
 		}
 
 		if endpoint.Responses != nil {

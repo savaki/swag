@@ -31,9 +31,11 @@ func main() {
 				Summary:     "Add a New Pet",
 				Description: "PetDescription",
 				HandlerFunc: echo,
-				Parameter: &swaggering.Parameter{
-					Description: "Thingie!",
-					Schema:      Owner{},
+				Parameters: []swaggering.Parameter{
+					{
+						Description: "Thingie!",
+						Schema:      Owner{},
+					},
 				},
 				Responses: map[int]swaggering.Response{
 					http.StatusOK: {
