@@ -29,7 +29,7 @@ type ApiResponse struct {
 
 func TestDefine(t *testing.T) {
 	Convey("Given a thing", t, func() {
-		v := define("#/definitions", Pet{})
+		v := define(Pet{})
 		data, _ := json.MarshalIndent(v, "", "  ")
 		fmt.Println(string(data))
 	})
