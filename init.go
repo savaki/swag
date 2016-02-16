@@ -1,6 +1,9 @@
 package swaggering
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func (api *Api) initSwagger() *SwaggerApi {
 	s := &SwaggerApi{}
@@ -96,7 +99,7 @@ func (api *Api) initResponse(code int, response Response) (string, SwaggerRespon
 func (api *Api) initEndpoint(endpoint Endpoint) *SwaggerEndpoint {
 	se := &SwaggerEndpoint{
 		Path:        endpoint.Path,
-		Method:      endpoint.Method,
+		Method:      strings.ToLower(endpoint.Method),
 		Summary:     endpoint.Summary,
 		Description: endpoint.Description,
 		OperationId: endpoint.Method + endpoint.Path,

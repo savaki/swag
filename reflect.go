@@ -101,6 +101,12 @@ func defineObject(v interface{}) Object {
 	}
 
 	properties := map[string]Property{}
+	isArray := (t.Kind() == reflect.Slice)
+
+	if isArray {
+		t = t.Elem()
+	}
+
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 
@@ -122,6 +128,7 @@ func defineObject(v interface{}) Object {
 	}
 
 	return Object{
+		IsArray:    isArray,
 		GoType:     t,
 		Type:       "object",
 		Name:       t.Name(),
