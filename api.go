@@ -31,6 +31,10 @@ type Endpoint struct {
 	Consumes    []string
 	Parameter   *Parameter
 	Responses   map[int]Response
+
+	// Value is a container for arbitrary content to provide support for non net/http web frameworks
+	// like gin
+	Func interface{}
 }
 
 func (e *Endpoint) ServeHTTP(w http.ResponseWriter, req *http.Request) {
