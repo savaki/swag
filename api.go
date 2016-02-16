@@ -60,10 +60,19 @@ type Api struct {
 	BasePath    string                `json:"basePath,omitempty"`
 	Schemes     []string              `json:"schemes,omitempty"`
 	Paths       map[string]*Endpoints `json:"paths,omitempty"`
-	Definitions map[string]Definition `json:"definitions,omitempty"`
+	Definitions map[string]Object `json:"definitions,omitempty"`
 }
 
-func (api *Api) Add(endpoint *Endpoint) *Api {
+func (api *Api) AddDefinition(definition Object) *Api {
+	if api.Definitions == nil {
+		api.Definitions = map[string]Object{}
+	}
+
+	api.Definitions[definition.Name] = definition
+	return api
+}
+
+func (api *Api) AddEndpoint(endpoint *Endpoint) *Api {
 	if api.Paths == nil {
 		api.Paths = map[string]*Endpoints{}
 	}
@@ -91,12 +100,9 @@ func (api *Api) Add(endpoint *Endpoint) *Api {
 	return api
 }
 
-func (api *Api) Endpoint(method, path string, handler http.Handler, options ...EndpointOption) *Api {
-	return api.Add(NewEndpoint(method, path, handler, options...))
-}
-
 func (api *Api) EndpointFunc(method, path string, handlerFunc http.HandlerFunc, options ...EndpointOption) *Api {
-	return api.Endpoint(method, path, handlerFunc, options...)
+	endpoint := api.newEndpoint(method, path, handlerFunc, options...)
+	return api.AddEndpoint(endpoint)
 }
 
 func (api *Api) Walk(walkFunc func(path string, endpoints *Endpoints)) {
