@@ -143,7 +143,7 @@ func Response(code int, description string, options ...TypeOption) EndpointOptio
 	}
 }
 
-func Type(v interface{}) TypeOption {
+func ResponseType(v interface{}) TypeOption {
 	return func(api *Api, response *ResponseItem) {
 		if v == nil {
 			return

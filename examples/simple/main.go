@@ -39,7 +39,7 @@ func main() {
 			swaggering.ParamDescription("adding the thing to the thing"),
 			swaggering.ParamType(Owner{}),
 		),
-		swaggering.Response(http.StatusOK, "successful operation", swaggering.Type(Pet{})),
+		swaggering.Response(http.StatusOK, "successful operation", swaggering.ResponseType(Pet{})),
 		swaggering.Response(http.StatusBadRequest, "Invalid status value"),
 	)
 
