@@ -60,7 +60,7 @@ type Api struct {
 	BasePath    string                `json:"basePath,omitempty"`
 	Schemes     []string              `json:"schemes,omitempty"`
 	Paths       map[string]*Endpoints `json:"paths,omitempty"`
-	Definitions map[string]Object `json:"definitions,omitempty"`
+	Definitions map[string]Object     `json:"definitions,omitempty"`
 }
 
 func (api *Api) AddDefinition(definition Object) *Api {
@@ -100,7 +100,7 @@ func (api *Api) AddEndpoint(endpoint *Endpoint) *Api {
 	return api
 }
 
-func (api *Api) EndpointFunc(method, path string, handlerFunc http.HandlerFunc, options ...EndpointOption) *Api {
+func (api *Api) WithEndpoint(method, path string, handlerFunc http.HandlerFunc, options ...EndpointOption) *Api {
 	endpoint := api.newEndpoint(method, path, handlerFunc, options...)
 	return api.AddEndpoint(endpoint)
 }
@@ -119,41 +119,9 @@ func (api *Api) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(api)
 }
 
-type ApiOption func(*Api)
-
-func ApiDescription(v string) ApiOption {
-	return func(api *Api) {
-		api.Info.Description = v
-	}
-}
-
-func ApiVersion(v string) ApiOption {
-	return func(api *Api) {
-		api.Info.Version = v
-	}
-}
-
-func ApiTitle(v string) ApiOption {
-	return func(api *Api) {
-		api.Info.Title = v
-	}
-}
-
-func ApiEmail(v string) ApiOption {
-	return func(api *Api) {
-		api.Info.Contact.Email = v
-	}
-}
-
-func ApiBasePath(v string) ApiOption {
-	return func(api *Api) {
-		api.BasePath = v
-	}
-}
-
 // NewApi creates a new api instances using default parameters.  Additional parameters can be
 // configured using ApiOption
-func NewApi(options ...ApiOption) (*Api, error) {
+func NewApi() *Api {
 	api := &Api{
 		Swagger:  "2.0",
 		BasePath: "/",
@@ -168,9 +136,25 @@ func NewApi(options ...ApiOption) (*Api, error) {
 	api.Info.License.Name = "Apache 2.0"
 	api.Info.License.Url = "http://www.apache.org/licenses/LICENSE-2.0.html"
 
-	for _, option := range options {
-		option(api)
-	}
+	return api
+}
 
-	return api, nil
+func (api *Api) WithBasePath(v string) *Api {
+	api.BasePath = v
+	return api
+}
+
+func (api *Api) WithDescription(v string) *Api {
+	api.Info.Description = v
+	return api
+}
+
+func (api *Api) WithEmail(v string) *Api {
+	api.Info.Contact.Email = v
+	return api
+}
+
+func (api *Api) WithTitle(v string) *Api {
+	api.Info.Title = v
+	return api
 }

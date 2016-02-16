@@ -25,14 +25,13 @@ func echo(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	api, _ := swaggering.NewApi(
-		swaggering.ApiBasePath("/api"),
-	)
+	api := swaggering.NewApi().
+		WithBasePath("/api")
 
-	api.EndpointFunc("post", "/pet", echo,
+	api.WithEndpoint("post", "/pet", echo,
 		swaggering.Summary("Add a new pet to the store"),
 	)
-	api.EndpointFunc("get", "/pet/findByStatus", echo,
+	api.WithEndpoint("get", "/pet/findByStatus", echo,
 		swaggering.Summary("Finds Pets by status"),
 		swaggering.Description("Multiple status values can be provided with comma separated strings"),
 		swaggering.Param(
