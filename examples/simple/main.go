@@ -45,6 +45,10 @@ func main() {
 		},
 	}
 
+	api.Walk(func(path string, endpoint *swaggering.SwaggerEndpoints) {
+		http.Handle(path, endpoint)
+	})
+
 	http.Handle("/swagger", api)
 	http.ListenAndServe(":8080", nil)
 }

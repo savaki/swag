@@ -3,6 +3,7 @@ package swaggering
 import (
 	"encoding/json"
 	"net/http"
+	"path/filepath"
 	"sync"
 )
 
@@ -60,8 +61,12 @@ type Api struct {
 	swagger *SwaggerApi
 }
 
-func (api *Api) Walk(callback func(path string, endpoints *Endpoint)) {
+func (api *Api) Walk(callback func(path string, endpoints *SwaggerEndpoints)) {
 	api.init()
+
+	for path, endpoints := range api.swagger.Paths {
+		callback(filepath.Join(api.BasePath, path), endpoints)
+	}
 }
 
 func (api *Api) ServeHTTP(w http.ResponseWriter, req *http.Request) {
