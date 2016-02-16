@@ -122,9 +122,9 @@ func Param(options ...ParamOption) EndpointOption {
 	}
 }
 
-type TypeOption func(*Api, *ResponseItem)
+type ResponseOption func(*Api, *ResponseItem)
 
-func Response(code int, description string, options ...TypeOption) EndpointOption {
+func Response(code int, description string, options ...ResponseOption) EndpointOption {
 	return func(api *Api, endpoint *Endpoint) {
 		if endpoint.Responses == nil {
 			endpoint.Responses = map[string]ResponseItem{}
@@ -143,7 +143,7 @@ func Response(code int, description string, options ...TypeOption) EndpointOptio
 	}
 }
 
-func ResponseType(v interface{}) TypeOption {
+func ResponseType(v interface{}) ResponseOption {
 	return func(api *Api, response *ResponseItem) {
 		if v == nil {
 			return
