@@ -12,12 +12,12 @@ func echo(w http.ResponseWriter, req *http.Request) {
 }
 
 type Owner struct {
-	Name string
+	Name string `json:"name"`
 }
 
 type Pet struct {
-	Name  string
-	Owner Owner
+	Name  string `json:"name"`
+	Owner Owner  `json:"owner" required:"true"`
 }
 
 func main() {
