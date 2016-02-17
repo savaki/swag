@@ -74,7 +74,9 @@ func (api *Api) Walk(callback func(path string, endpoints *SwaggerEndpoints)) {
 }
 
 func (api *Api) Tree() *Tree {
-	tree := &Tree{}
+	tree := &Tree{
+		Name: api.BasePath,
+	}
 
 	for _, endpoint := range api.Endpoints {
 		tree.register(endpoint)
