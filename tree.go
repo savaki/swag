@@ -3,6 +3,7 @@ package swaggering
 import "strings"
 
 type Tree struct {
+	Name      string
 	Parent    *Tree
 	Children  map[string]*Tree
 	Endpoints map[string]Endpoint
@@ -19,10 +20,20 @@ func (t *Tree) child(dir string) *Tree {
 	}
 
 	child = &Tree{
+		Name:   "/" + dir,
 		Parent: t,
 	}
 	t.Children[dir] = child
 	return child
+}
+
+func (t *Tree) Path() string {
+	name := ""
+	for node := t; node != nil; node = node.Parent {
+		name = node.Name + name
+	}
+
+	return name
 }
 
 func (t *Tree) register(endpoint Endpoint) {

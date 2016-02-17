@@ -16,26 +16,6 @@ func TestTree(t *testing.T) {
 		tree := &Tree{}
 		tree.register(endpoint)
 
-		So(tree, ShouldResemble, &Tree{
-			Children: map[string]*Tree{
-				"hello": &Tree{
-					Children: map[string]*Tree{
-						"a": &Tree{
-							Children: map[string]*Tree{
-								"b": &Tree{
-									Children: map[string]*Tree{
-										"c": &Tree{
-											Endpoints: map[string]Endpoint{
-												endpoint.Method: endpoint,
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		})
+		So(tree.child("hello").child("a").child("b").child("c").Path(), ShouldEqual, endpoint.Path)
 	})
 }
