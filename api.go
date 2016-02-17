@@ -20,6 +20,12 @@ type Response struct {
 	Schema      interface{}
 }
 
+type Endpoints []Endpoint
+
+func (e Endpoints) Append(endpoints ...Endpoint) Endpoints {
+	return append(e, endpoints...)
+}
+
 type Endpoint struct {
 	Method      string
 	Path        string
