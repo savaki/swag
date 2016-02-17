@@ -73,6 +73,24 @@ func (api *Api) Walk(callback func(path string, endpoints *SwaggerEndpoints)) {
 	}
 }
 
+func (api *Api) Tree() *Tree {
+	tree := &Tree{}
+
+	for _, endpoint := range api.Endpoints {
+		tree.register(endpoint)
+	}
+
+	return tree
+}
+
+func (api *Api) WalkEndpoints(callback func(endpoint Endpoint)) {
+	api.init()
+
+	for _, endpoint := range api.Endpoints {
+		callback(endpoint)
+	}
+}
+
 func (api *Api) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	api.init()
 
