@@ -85,14 +85,6 @@ func (api *Api) Tree() *Tree {
 	return tree
 }
 
-func (api *Api) WalkEndpoints(callback func(endpoint Endpoint)) {
-	api.init()
-
-	for _, endpoint := range api.Endpoints {
-		callback(endpoint)
-	}
-}
-
 func (api *Api) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	api.init()
 
