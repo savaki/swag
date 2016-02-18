@@ -18,6 +18,7 @@ func (api *Api) initSwagger() *SwaggerApi {
 	s.Info.TermsOfService = "http://swagger.io/terms/"
 	s.Info.License.Name = "Apache 2.0"
 	s.Info.License.Url = "http://www.apache.org/licenses/LICENSE-2.0.html"
+	s.Tags = api.Tags
 
 	// override with user provided values
 
