@@ -7,12 +7,23 @@ import (
 	"sync"
 )
 
+type Tag struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Docs        struct {
+		Description string `json:"description"`
+		Url         string `json:"url"`
+	} `json:"externalDocs"`
+}
+
 type Parameter struct {
 	In          string
 	Name        string
 	Description string
 	Required    bool
 	Schema      interface{}
+	Type        string
+	Format      string
 }
 
 type Response struct {
@@ -20,13 +31,8 @@ type Response struct {
 	Schema      interface{}
 }
 
-type Endpoints []Endpoint
-
-func (e Endpoints) Append(endpoints ...Endpoint) Endpoints {
-	return append(e, endpoints...)
-}
-
 type Endpoint struct {
+	Tags        []string
 	Method      string
 	Path        string
 	Summary     string
@@ -51,6 +57,12 @@ func (e *Endpoint) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
+
+type Endpoints []Endpoint
+
+func (e Endpoints) Append(endpoints ...Endpoint) Endpoints {
+	return append(e, endpoints...)
 }
 
 type Api struct {

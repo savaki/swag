@@ -2,6 +2,7 @@ package swaggering
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -60,6 +61,7 @@ func (api *Api) initSchema(v interface{}) *SwaggerSchema {
 		schema.Items = &SwaggerItems{
 			Ref: makeRef(obj.Name),
 		}
+
 	} else {
 		schema.Type = "object"
 		schema.Ref = makeRef(obj.Name)
@@ -74,10 +76,23 @@ func (api *Api) initParameter(parameter Parameter) SwaggerParameter {
 		Name:        parameter.Name,
 		Description: parameter.Description,
 		Required:    parameter.Required,
+		Type:        parameter.Type,
+		Format:      parameter.Format,
 	}
 
 	if parameter.Schema != nil {
-		p.Schema = api.initSchema(parameter.Schema)
+		property := inspect(reflect.TypeOf(parameter.Schema))
+
+		switch property.GoType.Kind() {
+		case reflect.Struct:
+			p.Schema = api.initSchema(parameter.Schema)
+			if p.In == "" {
+				p.In = "body"
+			}
+			if p.Name == "" {
+				p.Name = "body"
+			}
+		}
 	}
 
 	return p
@@ -98,6 +113,7 @@ func (api *Api) initResponse(code int, response Response) (string, SwaggerRespon
 
 func (api *Api) initEndpoint(endpoint Endpoint) *SwaggerEndpoint {
 	se := &SwaggerEndpoint{
+		Tags:        endpoint.Tags,
 		Path:        endpoint.Path,
 		Method:      strings.ToLower(endpoint.Method),
 		Summary:     endpoint.Summary,

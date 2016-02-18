@@ -21,6 +21,8 @@ type SwaggerParameter struct {
 	Description string         `json:"description,omitempty"`
 	Required    bool           `json:"required"`
 	Schema      *SwaggerSchema `json:"schema,omitempty"`
+	Type        string         `json:"type,omitempty"`
+	Format      string         `json:"format,omitempty"`
 }
 
 type SwaggerResponse struct {
@@ -29,6 +31,7 @@ type SwaggerResponse struct {
 }
 
 type SwaggerEndpoint struct {
+	Tags        []string                   `json:"tags"`
 	Path        string                     `json:"-"`
 	Method      string                     `json:"-"`
 	Summary     string                     `json:"summary,omitempty"`
@@ -97,6 +100,7 @@ type SwaggerApi struct {
 	Schemes     []string                     `json:"schemes,omitempty"`
 	Paths       map[string]*SwaggerEndpoints `json:"paths,omitempty"`
 	Definitions map[string]Object            `json:"definitions,omitempty"`
+	Tags        []Tag                        `json:"tags"`
 }
 
 func (s *SwaggerApi) addEndpoint(endpoint *SwaggerEndpoint) {

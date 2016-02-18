@@ -17,7 +17,9 @@ type Pet struct {
 	Friends  []Person  `json:"friends"`
 	Pointer  *Person   `json:"pointer" required:"true"`
 	Pointers []*Person `json:"pointers"`
+	Int      int
 	Ints     []int
+	String   string
 	Strings  []string
 }
 
@@ -30,6 +32,10 @@ type ApiResponse struct {
 func TestDefine(t *testing.T) {
 	Convey("Given a thing", t, func() {
 		v := define(Pet{})
+		obj, ok := v["Pet"]
+		So(ok, ShouldBeTrue)
+		So(obj.IsArray, ShouldBeFalse)
+
 		data, _ := json.MarshalIndent(v, "", "  ")
 		fmt.Println(string(data))
 	})
