@@ -140,9 +140,10 @@ func (api *Api) initEndpoint(endpoint Endpoint) *SwaggerEndpoint {
 	}
 
 	// handle the parameters
-	if endpoint.Parameters != nil && len(endpoint.Parameters) == 1 {
-		se.Parameters = []SwaggerParameter{
-			api.initParameter(endpoint.Parameters[0]),
+	if endpoint.Parameters != nil {
+		se.Parameters = []SwaggerParameter{}
+		for _, p := range endpoint.Parameters {
+			se.Parameters = append(se.Parameters, api.initParameter(p))
 		}
 	}
 
@@ -162,8 +163,12 @@ func (api *Api) initDefinitions() map[string]Object {
 
 	// collect all the objects from all the endpoints
 	for _, endpoint := range api.Endpoints {
-		if endpoint.Parameters != nil && len(endpoint.Parameters) == 1 && endpoint.Parameters[0].Schema != nil {
-			objects = append(objects, endpoint.Parameters[0].Schema)
+		if endpoint.Parameters != nil {
+			for _, p := range endpoint.Parameters {
+				if p.Schema != nil {
+					objects = append(objects, p.Schema)
+				}
+			}
 		}
 
 		if endpoint.Responses != nil {
