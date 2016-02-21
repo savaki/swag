@@ -53,11 +53,13 @@ func inspect(t reflect.Type) Property {
 		p.Type = "string"
 
 	case reflect.Struct:
-		p.Ref = makeRef(p.GoType.Name())
+		name := makeName(p.GoType)
+		p.Ref = makeRef(name)
 
 	case reflect.Ptr:
 		p.GoType = t.Elem()
-		p.Ref = makeRef(p.GoType.Name())
+		name := makeName(p.GoType)
+		p.Ref = makeRef(name)
 
 	case reflect.Slice:
 		p.Type = "array"
@@ -67,10 +69,12 @@ func inspect(t reflect.Type) Property {
 		switch p.GoType.Kind() {
 		case reflect.Ptr:
 			p.GoType = p.GoType.Elem()
-			p.Items.Ref = makeRef(p.GoType.Name())
+			name := makeName(p.GoType)
+			p.Items.Ref = makeRef(name)
 
 		case reflect.Struct:
-			p.Items.Ref = makeRef(p.GoType.Name())
+			name := makeName(p.GoType)
+			p.Items.Ref = makeRef(name)
 
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Uint8, reflect.Uint16, reflect.Uint32:
 			p.Items.Type = "integer"
@@ -139,7 +143,7 @@ func defineObject(v interface{}) Object {
 		IsArray:    isArray,
 		GoType:     t,
 		Type:       "object",
-		Name:       t.Name(),
+		Name:       makeName(t),
 		Required:   required,
 		Properties: properties,
 	}
@@ -158,7 +162,7 @@ func define(v interface{}) map[string]Object {
 		for _, d := range objs {
 			for _, p := range d.Properties {
 				if p.GoType.Kind() == reflect.Struct {
-					name := p.GoType.Name()
+					name := makeName(p.GoType)
 					if _, exists := objs[name]; !exists {
 						child := defineObject(p.GoType)
 						objs[child.Name] = child

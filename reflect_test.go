@@ -32,7 +32,7 @@ type ApiResponse struct {
 func TestDefine(t *testing.T) {
 	Convey("Given a thing", t, func() {
 		v := define(Pet{})
-		obj, ok := v["Pet"]
+		obj, ok := v["swaggeringPet"]
 		So(ok, ShouldBeTrue)
 		So(obj.IsArray, ShouldBeFalse)
 
