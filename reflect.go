@@ -46,6 +46,9 @@ func inspect(t reflect.Type) Property {
 		p.Type = "integer"
 		p.Format = "int64"
 
+	case reflect.Bool:
+		p.Type = "boolean"
+
 	case reflect.String:
 		p.Type = "string"
 
