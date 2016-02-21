@@ -3,6 +3,7 @@ package swaggering
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type Object struct {
@@ -111,9 +112,13 @@ func defineObject(v interface{}) Object {
 		field := t.Field(i)
 
 		// determine the json name of the field
-		name := field.Tag.Get("json")
-		if name == "" {
+		name := strings.TrimSpace(field.Tag.Get("json"))
+		if name == "" || strings.HasPrefix(name, ",") {
 			name = field.Name
+		} else {
+			// strip out things like , omitempty
+			parts := strings.Split(name, ",")
+			name = parts[0]
 		}
 
 		// determine if this field is required or not
