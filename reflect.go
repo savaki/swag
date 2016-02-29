@@ -32,9 +32,14 @@ type Property struct {
 	Items       *Items       `json:"items,omitempty"`
 }
 
-func inspect(t reflect.Type) Property {
+func inspect(t reflect.Type, jsonTag string) Property {
 	p := Property{
 		GoType: t,
+	}
+
+	if strings.Contains(jsonTag, ",string") {
+		p.Type = "string"
+		return p
 	}
 
 	switch p.GoType.Kind() {
@@ -138,7 +143,7 @@ func defineObject(v interface{}) Object {
 			required = append(required, name)
 		}
 
-		properties[name] = inspect(field.Type)
+		properties[name] = inspect(field.Type, field.Tag.Get("json"))
 	}
 
 	return Object{

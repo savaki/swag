@@ -82,7 +82,7 @@ func (api *Api) initParameter(parameter Parameter) SwaggerParameter {
 	}
 
 	if parameter.Schema != nil {
-		property := inspect(reflect.TypeOf(parameter.Schema))
+		property := inspect(reflect.TypeOf(parameter.Schema), "")
 
 		switch property.GoType.Kind() {
 		case reflect.Struct:
