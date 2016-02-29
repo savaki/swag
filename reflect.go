@@ -127,6 +127,8 @@ func defineObject(v interface{}) Object {
 			parts := strings.Split(name, ",")
 			name = parts[0]
 		}
+		parts := strings.Split(name, ",") // foo,omitempty => foo
+		name = parts[0]
 
 		// determine if this field is required or not
 		if v := field.Tag.Get("required"); v == "true" {
