@@ -1,7 +1,6 @@
 package swaggering
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 )
@@ -91,12 +90,7 @@ func inspect(t reflect.Type, jsonTag string) Property {
 
 		case reflect.String:
 			p.Items.Type = "string"
-
-		default:
-			fmt.Printf("Unhandled Slice Kind: %#v\n", t.Elem().Kind())
 		}
-	default:
-		fmt.Printf("Unhandled Kind: %#v\n", t.Kind())
 	}
 
 	return p
