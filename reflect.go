@@ -88,6 +88,14 @@ func inspect(t reflect.Type, jsonTag string) Property {
 			p.Items.Type = "integer"
 			p.Items.Format = "int64"
 
+		case reflect.Float64:
+			p.Items.Type = "number"
+			p.Items.Format = "double"
+
+		case reflect.Float32:
+			p.Items.Type = "number"
+			p.Items.Format = "float"
+
 		case reflect.String:
 			p.Items.Type = "string"
 		}
