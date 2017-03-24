@@ -7,10 +7,13 @@ import (
 )
 
 func (api *Api) initSwagger() *SwaggerApi {
-	s := &SwaggerApi{}
-	s.BasePath = "/"
-	s.Swagger = "2.0"
-	s.Schemes = []string{"http"}
+	s := &SwaggerApi{
+		BasePath: "/",
+		Swagger:  "2.0",
+		Schemes:  []string{"http"},
+		Tags:     api.Tags,
+	}
+
 	s.Info.Contact.Email = "your-email-address"
 	s.Info.Description = "Describe your API"
 	s.Info.Title = "Your API Title"
@@ -18,7 +21,6 @@ func (api *Api) initSwagger() *SwaggerApi {
 	s.Info.TermsOfService = "http://swagger.io/terms/"
 	s.Info.License.Name = "Apache 2.0"
 	s.Info.License.Url = "http://www.apache.org/licenses/LICENSE-2.0.html"
-	s.Tags = api.Tags
 
 	// override with user provided values
 
