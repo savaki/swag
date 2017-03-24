@@ -2,10 +2,12 @@ package swaggering
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"bytes"
+	"io/ioutil"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type Person struct {
@@ -13,14 +15,18 @@ type Person struct {
 }
 
 type Pet struct {
-	Friend   Person    `json:"friend"`
-	Friends  []Person  `json:"friends"`
-	Pointer  *Person   `json:"pointer" required:"true"`
-	Pointers []*Person `json:"pointers"`
-	Int      int
-	Ints     []int
-	String   string
-	Strings  []string
+	Friend      Person    `json:"friend"`
+	Friends     []Person  `json:"friends"`
+	Pointer     *Person   `json:"pointer" required:"true"`
+	Pointers    []*Person `json:"pointers"`
+	Int         int
+	IntArray    []int
+	String      string
+	StringArray []string
+}
+
+type Empty struct {
+	Nope int `json:"-"`
 }
 
 type ApiResponse struct {
@@ -30,13 +36,42 @@ type ApiResponse struct {
 }
 
 func TestDefine(t *testing.T) {
-	Convey("Given a thing", t, func() {
+	t.Run("Given a thing", func(t *testing.T) {
 		v := define(Pet{})
 		obj, ok := v["swaggeringPet"]
-		So(ok, ShouldBeTrue)
-		So(obj.IsArray, ShouldBeFalse)
+		assert.True(t, ok)
+		assert.False(t, obj.IsArray)
+		assert.Equal(t, 8, len(obj.Properties))
 
-		data, _ := json.MarshalIndent(v, "", "  ")
-		fmt.Println(string(data))
+		content := map[string]Object{}
+		data, err := ioutil.ReadFile("testdata/pet.json")
+		assert.Nil(t, err)
+		err = json.NewDecoder(bytes.NewReader(data)).Decode(&content)
+		assert.Nil(t, err)
+		expected := content["swaggeringPet"]
+
+		assert.Equal(t, expected.IsArray, obj.IsArray, "expected IsArray to match")
+		assert.Equal(t, expected.Type, obj.Type, "expected Type to match")
+		assert.Equal(t, expected.Required, obj.Required, "expected Required to match")
+		assert.Equal(t, len(expected.Properties), len(obj.Properties), "expected same number of properties")
+
+		for k, v := range obj.Properties {
+			e := expected.Properties[k]
+			assert.Equal(t, e.Type, v.Type, "expected %v.Type to match", k)
+			assert.Equal(t, e.Description, v.Description, "expected %v.Required to match", k)
+			assert.Equal(t, e.Enum, v.Enum, "expected %v.Required to match", k)
+			assert.Equal(t, e.Format, v.Format, "expected %v.Required to match", k)
+			assert.Equal(t, e.Ref, v.Ref, "expected %v.Required to match", k)
+			assert.Equal(t, e.Example, v.Example, "expected %v.Required to match", k)
+			assert.Equal(t, e.Items, v.Items, "expected %v.Required to match", k)
+		}
 	})
+}
+
+func TestHonorJsonIgnore(t *testing.T) {
+	v := define(Empty{})
+	obj, ok := v["swaggeringEmpty"]
+	assert.True(t, ok)
+	assert.False(t, obj.IsArray)
+	assert.Equal(t, 0, len(obj.Properties), "expected zero exposed properties")
 }

@@ -124,7 +124,7 @@ func defineObject(v interface{}) Object {
 	}
 
 	properties := map[string]Property{}
-	isArray := (t.Kind() == reflect.Slice)
+	isArray := t.Kind() == reflect.Slice
 
 	if isArray {
 		t = t.Elem()
@@ -137,13 +137,19 @@ func defineObject(v interface{}) Object {
 		name := strings.TrimSpace(field.Tag.Get("json"))
 		if name == "" || strings.HasPrefix(name, ",") {
 			name = field.Name
+
 		} else {
 			// strip out things like , omitempty
 			parts := strings.Split(name, ",")
 			name = parts[0]
 		}
+
 		parts := strings.Split(name, ",") // foo,omitempty => foo
 		name = parts[0]
+		if name == "-" {
+			// honor json ignore tag
+			continue
+		}
 
 		// determine if this field is required or not
 		if v := field.Tag.Get("required"); v == "true" {
@@ -153,7 +159,8 @@ func defineObject(v interface{}) Object {
 			required = append(required, name)
 		}
 
-		properties[name] = inspect(field.Type, field.Tag.Get("json"))
+		p := inspect(field.Type, field.Tag.Get("json"))
+		properties[name] = p
 	}
 
 	return Object{
@@ -167,22 +174,22 @@ func defineObject(v interface{}) Object {
 }
 
 func define(v interface{}) map[string]Object {
-	objs := map[string]Object{}
+	objMap := map[string]Object{}
 
 	obj := defineObject(v)
-	objs[obj.Name] = obj
+	objMap[obj.Name] = obj
 
 	dirty := true
 
 	for dirty {
 		dirty = false
-		for _, d := range objs {
+		for _, d := range objMap {
 			for _, p := range d.Properties {
 				if p.GoType.Kind() == reflect.Struct {
 					name := makeName(p.GoType)
-					if _, exists := objs[name]; !exists {
+					if _, exists := objMap[name]; !exists {
 						child := defineObject(p.GoType)
-						objs[child.Name] = child
+						objMap[child.Name] = child
 						dirty = true
 					}
 				}
@@ -190,5 +197,5 @@ func define(v interface{}) map[string]Object {
 		}
 	}
 
-	return objs
+	return objMap
 }

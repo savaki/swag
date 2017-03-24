@@ -1,0 +1,56 @@
+{
+  "swaggeringPerson": {
+    "type": "object",
+    "properties": {
+      "First": {
+        "type": "string"
+      }
+    }
+  },
+  "swaggeringPet": {
+    "type": "object",
+    "required": [
+      "pointer"
+    ],
+    "properties": {
+      "Int": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "IntArray": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "String": {
+        "type": "string"
+      },
+      "StringArray": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "friend": {
+        "$ref": "#/definitions/swaggeringPerson"
+      },
+      "friends": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/swaggeringPerson"
+        }
+      },
+      "pointer": {
+        "$ref": "#/definitions/swaggeringPerson"
+      },
+      "pointers": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/swaggeringPerson"
+        }
+      }
+    }
+  }
+}
