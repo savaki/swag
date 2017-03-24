@@ -37,8 +37,8 @@ type Endpoint struct {
 	Path        string
 	Summary     string
 	Description string
-	Handler     http.Handler
-	HandlerFunc http.HandlerFunc
+	Handler     http.Handler     `json:"-"`
+	HandlerFunc http.HandlerFunc `json:"-"`
 	Produces    []string
 	Consumes    []string
 	Parameters  []Parameter
@@ -46,7 +46,7 @@ type Endpoint struct {
 
 	// Value is a container for arbitrary content to provide support for non net/http web frameworks
 	// like gin
-	Func interface{}
+	Func interface{} `json:"-"`
 }
 
 func (e *Endpoint) ServeHTTP(w http.ResponseWriter, req *http.Request) {

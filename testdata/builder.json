@@ -1,0 +1,52 @@
+{
+  "Tags": [
+    "tag1",
+    "tag2"
+  ],
+  "Method": "GET",
+  "Path": "/",
+  "Summary": "the summary",
+  "Description": "the description",
+  "Produces": null,
+  "Consumes": null,
+  "Parameters": [
+    {
+      "In": "query",
+      "Name": "q",
+      "Description": "q string",
+      "Required": true,
+      "Schema": null,
+      "Type": "string",
+      "Format": ""
+    },
+    {
+      "In": "path",
+      "Name": "p",
+      "Description": "p string",
+      "Required": true,
+      "Schema": null,
+      "Type": "int",
+      "Format": ""
+    },
+    {
+      "In": "",
+      "Name": "",
+      "Description": "login object",
+      "Required": true,
+      "Schema": {
+        "Username": "",
+        "Password": ""
+      },
+      "Type": "",
+      "Format": ""
+    }
+  ],
+  "Responses": {
+    "200": {
+      "Description": "successful login",
+      "Schema": {
+        "UserID": 0
+      }
+    }
+  }
+}
