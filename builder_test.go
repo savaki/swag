@@ -20,14 +20,14 @@ type Session struct {
 }
 
 func TestBuilder(t *testing.T) {
-	b := swaggering.New("get", "/", nil)
-	b.Summary("the summary")
-	b.Description("the description")
-	b.Tags("tag1", "tag2")
-	b.Query("q", "string", "q string", true)
-	b.Path("p", "int", "p string", true)
-	b.Schema(Login{}, "login object", true)
-	b.Response(http.StatusOK, Session{}, "successful login")
+	b := swaggering.New("get", "/", nil).
+		Summary("the summary").
+		Description("the description").
+		Tags("tag1", "tag2").
+		Query("q", "string", "q string", true).
+		Path("p", "int", "p string", true).
+		Schema(Login{}, "login object", true).
+		Response(http.StatusOK, Session{}, "successful login")
 
 	data, err := json.Marshal(b.Endpoint)
 	assert.Nil(t, err)
