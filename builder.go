@@ -6,6 +6,11 @@ type Builder struct {
 	Endpoint Endpoint
 }
 
+func (b *Builder) Func(v interface{}) *Builder {
+	b.Endpoint.Func = v
+	return b
+}
+
 func (b *Builder) Summary(v string) *Builder {
 	b.Endpoint.Summary = v
 	return b
