@@ -109,13 +109,18 @@ func (api *Api) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	// customize the swagger header based on host
 	//
-	hostAndScheme := req.Host + ":" + req.URL.Scheme
+	scheme := req.URL.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+
+	hostAndScheme := req.Host + ":" + scheme
 	api.mux.Lock()
 	v, ok := api.byHostAndScheme[hostAndScheme]
 	if !ok {
 		v = api.template.clone()
 		v.Host = req.Host
-		v.Schemes = []string{req.URL.Scheme}
+		v.Schemes = []string{scheme}
 		api.byHostAndScheme[hostAndScheme] = v
 	}
 	api.mux.Unlock()
