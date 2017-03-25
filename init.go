@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 func (api *Api) initSwagger() *SwaggerApi {
@@ -195,14 +196,21 @@ func (api *Api) initDefinitions() map[string]Object {
 }
 
 func (api *Api) initOnce() {
-	api.swagger = api.initSwagger()
+	// initialize properties that haven't been set
+	//
+	api.mux = &sync.Mutex{}
+	api.byHostAndScheme = map[string]*SwaggerApi{}
+
+	// render the input into the swagger model
+	//
+	api.template = api.initSwagger()
 
 	for _, endpoint := range api.Endpoints {
 		se := api.initEndpoint(endpoint)
-		api.swagger.addEndpoint(se)
+		api.template.addEndpoint(se)
 	}
 
-	api.swagger.Definitions = api.initDefinitions()
+	api.template.Definitions = api.initDefinitions()
 }
 
 func (api *Api) init() {

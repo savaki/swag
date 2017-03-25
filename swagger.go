@@ -1,6 +1,7 @@
 package swaggering
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 )
@@ -102,6 +103,14 @@ type SwaggerApi struct {
 	Definitions map[string]Object            `json:"definitions,omitempty"`
 	Tags        []Tag                        `json:"tags"`
 	Host        string                       `json:"host"`
+}
+
+func (s *SwaggerApi) clone() *SwaggerApi {
+	data, _ := json.Marshal(s)
+
+	clone := &SwaggerApi{}
+	json.Unmarshal(data, &clone)
+	return clone
 }
 
 func (s *SwaggerApi) addEndpoint(endpoint *SwaggerEndpoint) {

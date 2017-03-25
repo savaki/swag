@@ -80,15 +80,17 @@ type Api struct {
 	Host           string
 
 	// CORS indicates whether the swagger api should generate CORS * headers
-	CORS    bool
-	once    sync.Once
-	swagger *SwaggerApi
+	CORS            bool
+	once            sync.Once
+	mux             *sync.Mutex
+	byHostAndScheme map[string]*SwaggerApi
+	template        *SwaggerApi
 }
 
 func (api *Api) Walk(callback func(path string, endpoints *SwaggerEndpoints)) {
 	api.init()
 
-	for path, endpoints := range api.swagger.Paths {
+	for path, endpoints := range api.template.Paths {
 		callback(filepath.Join(api.BasePath, path), endpoints)
 	}
 }
@@ -104,5 +106,19 @@ func (api *Api) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(api.swagger)
+
+	// customize the swagger header based on host
+	//
+	hostAndScheme := req.Host + ":" + req.URL.Scheme
+	api.mux.Lock()
+	v, ok := api.byHostAndScheme[hostAndScheme]
+	if !ok {
+		v = api.template.clone()
+		v.Host = req.Host
+		v.Schemes = []string{req.URL.Scheme}
+		api.byHostAndScheme[hostAndScheme] = v
+	}
+	api.mux.Unlock()
+
+	json.NewEncoder(w).Encode(v)
 }
