@@ -1,9 +1,17 @@
 package swaggering
 
-import "strings"
+import (
+	"net/http"
+	"strings"
+)
 
 type Builder struct {
 	Endpoint Endpoint
+}
+
+func (b *Builder) Handler(h http.Handler) *Builder {
+	b.Endpoint.Handler = h
+	return b
 }
 
 func (b *Builder) Func(v interface{}) *Builder {
