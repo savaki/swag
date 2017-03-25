@@ -101,6 +101,7 @@ type SwaggerApi struct {
 	Paths       map[string]*SwaggerEndpoints `json:"paths,omitempty"`
 	Definitions map[string]Object            `json:"definitions,omitempty"`
 	Tags        []Tag                        `json:"tags"`
+	Host        string                       `json:"host"`
 }
 
 func (s *SwaggerApi) addEndpoint(endpoint *SwaggerEndpoint) {

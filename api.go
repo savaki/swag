@@ -77,6 +77,7 @@ type Api struct {
 	Schemes        []string
 	Endpoints      []Endpoint
 	Tags           []Tag
+	Host           string
 
 	// CORS indicates whether the swagger api should generate CORS * headers
 	CORS    bool

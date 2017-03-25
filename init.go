@@ -12,6 +12,7 @@ func (api *Api) initSwagger() *SwaggerApi {
 		Swagger:  "2.0",
 		Schemes:  []string{"http"},
 		Tags:     api.Tags,
+		Host:     api.Host,
 	}
 
 	s.Info.Contact.Email = "your-email-address"
