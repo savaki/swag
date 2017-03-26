@@ -5,31 +5,31 @@ import (
 	"strings"
 )
 
-type Builder struct {
+type EndpointBuilder struct {
 	Endpoint Endpoint
 }
 
-func (b *Builder) Handler(h http.Handler) *Builder {
+func (b *EndpointBuilder) Handler(h http.Handler) *EndpointBuilder {
 	b.Endpoint.Handler = h
 	return b
 }
 
-func (b *Builder) Func(v interface{}) *Builder {
+func (b *EndpointBuilder) Func(v interface{}) *EndpointBuilder {
 	b.Endpoint.Func = v
 	return b
 }
 
-func (b *Builder) Summary(v string) *Builder {
+func (b *EndpointBuilder) Summary(v string) *EndpointBuilder {
 	b.Endpoint.Summary = v
 	return b
 }
 
-func (b *Builder) Description(v string) *Builder {
+func (b *EndpointBuilder) Description(v string) *EndpointBuilder {
 	b.Endpoint.Description = v
 	return b
 }
 
-func (b *Builder) Parameter(p Parameter) *Builder {
+func (b *EndpointBuilder) Parameter(p Parameter) *EndpointBuilder {
 	if b.Endpoint.Parameters == nil {
 		b.Endpoint.Parameters = []Parameter{}
 	}
@@ -38,7 +38,7 @@ func (b *Builder) Parameter(p Parameter) *Builder {
 	return b
 }
 
-func (b *Builder) Path(name, typ, description string, required bool) *Builder {
+func (b *EndpointBuilder) Path(name, typ, description string, required bool) *EndpointBuilder {
 	p := Parameter{
 		Name:        name,
 		In:          "path",
@@ -49,7 +49,7 @@ func (b *Builder) Path(name, typ, description string, required bool) *Builder {
 	return b.Parameter(p)
 }
 
-func (b *Builder) Query(name, typ, description string, required bool) *Builder {
+func (b *EndpointBuilder) Query(name, typ, description string, required bool) *EndpointBuilder {
 	p := Parameter{
 		Name:        name,
 		In:          "query",
@@ -60,7 +60,7 @@ func (b *Builder) Query(name, typ, description string, required bool) *Builder {
 	return b.Parameter(p)
 }
 
-func (b *Builder) Schema(schema interface{}, description string, required bool) *Builder {
+func (b *EndpointBuilder) Body(schema interface{}, description string, required bool) *EndpointBuilder {
 	p := Parameter{
 		Description: description,
 		Schema:      schema,
@@ -69,7 +69,7 @@ func (b *Builder) Schema(schema interface{}, description string, required bool) 
 	return b.Parameter(p)
 }
 
-func (b *Builder) Tags(tags ...string) *Builder {
+func (b *EndpointBuilder) Tags(tags ...string) *EndpointBuilder {
 	if b.Endpoint.Tags == nil {
 		b.Endpoint.Tags = []string{}
 	}
@@ -78,7 +78,7 @@ func (b *Builder) Tags(tags ...string) *Builder {
 	return b
 }
 
-func (b *Builder) Response(code int, schema interface{}, description string) *Builder {
+func (b *EndpointBuilder) Response(code int, schema interface{}, description string) *EndpointBuilder {
 	if b.Endpoint.Responses == nil {
 		b.Endpoint.Responses = map[int]Response{}
 	}
@@ -91,9 +91,9 @@ func (b *Builder) Response(code int, schema interface{}, description string) *Bu
 	return b
 }
 
-func New(method, path string, handler interface{}) *Builder {
+func NewEndpoint(method, path string, handler interface{}) *EndpointBuilder {
 	method = strings.ToUpper(method)
-	return &Builder{
+	return &EndpointBuilder{
 		Endpoint: Endpoint{
 			Method: method,
 			Path:   path,

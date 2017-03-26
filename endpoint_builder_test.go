@@ -20,13 +20,13 @@ type Session struct {
 }
 
 func TestBuilder(t *testing.T) {
-	b := swaggering.New("get", "/", nil).
+	b := swaggering.NewEndpoint("get", "/", nil).
 		Summary("the summary").
 		Description("the description").
 		Tags("tag1", "tag2").
 		Query("q", "string", "q string", true).
 		Path("p", "int", "p string", true).
-		Schema(Login{}, "login object", true).
+		Body(Login{}, "login object", true).
 		Response(http.StatusOK, Session{}, "successful login")
 
 	data, err := json.Marshal(b.Endpoint)

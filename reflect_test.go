@@ -1,11 +1,10 @@
 package swaggering
 
 import (
-	"encoding/json"
-	"testing"
-
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 )

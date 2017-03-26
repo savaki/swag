@@ -11,39 +11,32 @@ func echo(w http.ResponseWriter, req *http.Request) {
 	io.WriteString(w, "Hello World")
 }
 
-type Owner struct {
+type Category struct {
+	Id   int64  `json:"category"`
 	Name string `json:"name"`
 }
 
 type Pet struct {
-	Name  string `json:"name"`
-	Owner Owner  `json:"owner" required:"true"`
+	Id        int64    `json:"id"`
+	Category  Category `json:"category"`
+	Name      string   `json:"name"`
+	PhotoUrls []string `json:"photoUrls"`
+	Tags      []string `json:"tags"`
 }
 
 func main() {
+	endpoint := swaggering.NewEndpoint("post", "/", echo).
+		Summary("Add a new pet to the store").
+		Description("Additional information on adding a pet to the store").
+		Body(Pet{}, "Pet object that needs to be added to the store", true).
+		Response(http.StatusOK, Pet{}, "Successfully added pet").
+		Endpoint
+
 	api := &swaggering.Api{
 		BasePath: "/api",
 		CORS:     true,
 		Endpoints: []swaggering.Endpoint{
-			{
-				Method:      "get",
-				Path:        "/pet",
-				Summary:     "Add a New Pet",
-				Description: "PetDescription",
-				HandlerFunc: echo,
-				Parameters: []swaggering.Parameter{
-					{
-						Description: "Thingie!",
-						Schema:      Owner{},
-					},
-				},
-				Responses: map[int]swaggering.Response{
-					http.StatusOK: {
-						Description: "Woo hoo!",
-						Schema:      []Pet{},
-					},
-				},
-			},
+			endpoint,
 		},
 	}
 
