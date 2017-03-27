@@ -16,8 +16,8 @@ func Echo(w http.ResponseWriter, _ *http.Request) {
 
 func TestNew(t *testing.T) {
 	summary := "here's the summary"
-	e := endpoint.New("get", "/", Echo,
-		endpoint.Summary(summary),
+	e := endpoint.New("get", "/", summary,
+		endpoint.Handler(Echo),
 	)
 
 	assert.Equal(t, "GET", e.Method)
@@ -30,7 +30,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestTags(t *testing.T) {
-	e := endpoint.New("get", "/", Echo,
+	e := endpoint.New("get", "/", "get thing",
 		endpoint.Tags("blah"),
 	)
 
@@ -38,7 +38,7 @@ func TestTags(t *testing.T) {
 }
 
 func TestDescription(t *testing.T) {
-	e := endpoint.New("get", "/", Echo,
+	e := endpoint.New("get", "/", "get thing",
 		endpoint.Description("blah"),
 	)
 
@@ -46,7 +46,7 @@ func TestDescription(t *testing.T) {
 }
 
 func TestOperationId(t *testing.T) {
-	e := endpoint.New("get", "/", Echo,
+	e := endpoint.New("get", "/", "get thing",
 		endpoint.OperationId("blah"),
 	)
 
@@ -55,7 +55,7 @@ func TestOperationId(t *testing.T) {
 
 func TestProduces(t *testing.T) {
 	expected := []string{"a", "b"}
-	e := endpoint.New("get", "/", Echo,
+	e := endpoint.New("get", "/", "get thing",
 		endpoint.Produces(expected...),
 	)
 
@@ -64,7 +64,7 @@ func TestProduces(t *testing.T) {
 
 func TestConsumes(t *testing.T) {
 	expected := []string{"a", "b"}
-	e := endpoint.New("get", "/", Echo,
+	e := endpoint.New("get", "/", "get thing",
 		endpoint.Consumes(expected...),
 	)
 
@@ -80,7 +80,7 @@ func TestPath(t *testing.T) {
 		Type:        "string",
 	}
 
-	e := endpoint.New("get", "/", Echo,
+	e := endpoint.New("get", "/", "get thing",
 		endpoint.Path(expected.Name, expected.Type, expected.Description, expected.Required),
 	)
 
@@ -97,7 +97,7 @@ func TestQuery(t *testing.T) {
 		Type:        "string",
 	}
 
-	e := endpoint.New("get", "/", Echo,
+	e := endpoint.New("get", "/", "get thing",
 		endpoint.Query(expected.Name, expected.Type, expected.Description, expected.Required),
 	)
 
@@ -121,7 +121,7 @@ func TestBody(t *testing.T) {
 		},
 	}
 
-	e := endpoint.New("get", "/", Echo,
+	e := endpoint.New("get", "/", "get thing",
 		endpoint.Body(Model{}, expected.Description, expected.Required),
 	)
 
@@ -139,7 +139,7 @@ func TestResponse(t *testing.T) {
 		},
 	}
 
-	e := endpoint.New("get", "/", Echo,
+	e := endpoint.New("get", "/", "get thing",
 		endpoint.Response(http.StatusOK, Model{}, "successful"),
 	)
 

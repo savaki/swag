@@ -15,7 +15,46 @@ go get github.com/savaki/swag
 ```
 
 
-## Example
+## Concepts
+
+```swag``` uses functional options to generate both the swagger endpoints and the swagger definition.  Where possible
+```swag``` attempts to use reasonable defaults that may be overridden by the user.
+
+### Endpoints
+
+```swag``` provides a separate package, ```endpoint```, to generate swagger endpoints.  These endpoints can be passed
+to the swagger definition generate via ```swag.Endpoints(...)```
+
+In this simple example, we generate an endpoint to retrieve all pets.  The only required fields for an endpoint
+are the method, path, and the summary.  
+
+```go
+allPets := endpoint.New("get", "/pet", "Return all the pets") 
+```
+
+However, it'll probably be useful if you include definitions of what ```GET /pet``` returns:
+
+```go
+allPets := endpoint.New("get", "/pet", "Return all the pets",
+  endpoint.Response(http.StatusOk, Pet{}, "Successful operation"),
+  endpoint.Response(http.StatusInternalServerError, Error{}, "Oops ... something went wrong"),
+) 
+```
+
+Refer to the [godoc](https://godoc.org/github.com/savaki/swag/endpoint) for a list of all the endpoint options
+
+### Walk
+
+As a convenience to users, ```*swagger.Api``` implements a ```Walk``` method to simplify traversal of all the endpoints.
+See the complete example below for how ```Walk``` can be used to bind endpoints to the router.
+
+#### Parameters
+
+```go
+
+```
+
+## Complete Example
 
 ```go
 func handlePet(w http.ResponseWriter, _ *http.Request) {
@@ -32,14 +71,14 @@ type Pet struct {
 func main() {
     // define our endpoints
     // 
-    post := endpoint.New("post", "/", echo,
-        endpoint.Summary("Add a new pet to the store"),
+    post := endpoint.New("post", "/pet", "Add a new pet to the store",
+        endpoint.Handler(handle),
         endpoint.Description("Additional information on adding a pet to the store"),
         endpoint.Body(Pet{}, "Pet object that needs to be added to the store", true),
         endpoint.Response(http.StatusOK, Pet{}, "Successfully added pet"),
     )
-    get := endpoint.New("get", "/pet/{petId}", echo,
-        endpoint.Summary("Find pet by ID"),
+    get := endpoint.New("get", "/pet/{petId}", "Find pet by ID",
+        endpoint.Handler(handle),
         endpoint.Path("petId", "integer", "ID of pet to return", true),
         endpoint.Response(http.StatusOK, Pet{}, "successful operation"),
     )

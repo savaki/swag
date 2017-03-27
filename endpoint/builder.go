@@ -14,9 +14,12 @@ type Builder struct {
 
 type Option func(builder *Builder)
 
-func Summary(v string) Option {
+func Handler(handler interface{}) Option {
 	return func(b *Builder) {
-		b.Endpoint.Summary = v
+		if v, ok := handler.(func(w http.ResponseWriter, r *http.Request)); ok {
+			handler = http.HandlerFunc(v)
+		}
+		b.Endpoint.Handler = handler
 	}
 }
 
@@ -109,17 +112,13 @@ func Response(code int, prototype interface{}, description string) Option {
 	}
 }
 
-func New(method, path string, handler interface{}, options ...Option) *swagger.Endpoint {
-	if v, ok := handler.(func(w http.ResponseWriter, r *http.Request)); ok {
-		handler = http.HandlerFunc(v)
-	}
-
+func New(method, path, summary string, options ...Option) *swagger.Endpoint {
 	method = strings.ToUpper(method)
 	e := &Builder{
 		Endpoint: &swagger.Endpoint{
 			Method:   method,
 			Path:     path,
-			Handler:  handler,
+			Summary:  summary,
 			Produces: []string{"application/json"},
 			Consumes: []string{"application/json"},
 			Tags:     []string{},

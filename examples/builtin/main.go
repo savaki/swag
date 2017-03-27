@@ -27,14 +27,14 @@ type Pet struct {
 }
 
 func main() {
-	post := endpoint.New("post", "/pet", handle,
-		endpoint.Summary("Add a new pet to the store"),
+	post := endpoint.New("post", "/pet", "Add a new pet to the store",
+		endpoint.Handler(handle),
 		endpoint.Description("Additional information on adding a pet to the store"),
 		endpoint.Body(Pet{}, "Pet object that needs to be added to the store", true),
 		endpoint.Response(http.StatusOK, Pet{}, "Successfully added pet"),
 	)
-	get := endpoint.New("get", "/pet/{petId}", handle,
-		endpoint.Summary("Find pet by ID"),
+	get := endpoint.New("get", "/pet/{petId}", "Find pet by ID",
+		endpoint.Handler(handle),
 		endpoint.Path("petId", "integer", "ID of pet to return", true),
 		endpoint.Response(http.StatusOK, Pet{}, "successful operation"),
 	)
