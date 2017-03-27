@@ -9,7 +9,7 @@ var (
 	rePath = regexp.MustCompile(`\{([^}]+)}`)
 )
 
-// FixPath accepts a swagger path e.g. /api/orgs/{org} and returns a colon identified path e.g. /api/org/:org
+// ColonPath accepts a swagger path e.g. /api/orgs/{org} and returns a colon identified path e.g. /api/org/:org
 func ColonPath(path string) string {
 	matches := rePath.FindAllStringSubmatch(path, -1)
 	if matches != nil {
@@ -19,4 +19,3 @@ func ColonPath(path string) string {
 	}
 	return path
 }
-
