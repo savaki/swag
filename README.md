@@ -15,6 +15,11 @@ go get github.com/savaki/swag
 ```
 
 
+## Status
+
+This package should be considered a release candidate.  No further package changes are expected at this point. 
+
+
 ## Concepts
 
 ```swag``` uses functional options to generate both the swagger endpoints and the swagger definition.  Where possible
@@ -48,10 +53,20 @@ Refer to the [godoc](https://godoc.org/github.com/savaki/swag/endpoint) for a li
 As a convenience to users, ```*swagger.Api``` implements a ```Walk``` method to simplify traversal of all the endpoints.
 See the complete example below for how ```Walk``` can be used to bind endpoints to the router.
 
-#### Parameters
-
 ```go
+api := swag.New(
+    swag.Title("Swagger Petstore"),
+    swag.Endpoints(post, get),
+)
 
+// iterate over each endpoint, if we've defined a handler, we can use it to bind to the router.  We're using ```gin``
+// in this example, but any web framework will do.
+// 
+api.Walk(func(path string, endpoint *swagger.Endpoint) {
+    h := endpoint.Handler.(func(c *gin.Context))
+    path = swag.ColonPath(path)
+    router.Handle(endpoint.Method, path, h)
+})
 ```
 
 ## Complete Example
@@ -92,10 +107,9 @@ func main() {
     
     // iterate over each endpoint and add them to the default server mux
     // 
-    api.Walk(func(path string, endpoint *swagger.Endpoint) {
-        h := endpoint.Handler.(http.HandlerFunc)
-        http.Handle(path, h)
-    })
+    for path, endpoints := range api.Paths {
+      http.Handle(path, endpoints)
+    }
     
     // use the api to server the swagger.json file
     // 

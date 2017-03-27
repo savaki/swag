@@ -3,6 +3,7 @@ package swagger
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"path/filepath"
 	"reflect"
@@ -64,6 +65,49 @@ type Endpoints struct {
 	Patch   *Endpoint `json:"patch,omitempty"`
 	Trace   *Endpoint `json:"trace,omitempty"`
 	Connect *Endpoint `json:"connect,omitempty"`
+}
+
+// ServeHTTP allows endpoints to serve itself using the builtin http mux
+func (e *Endpoints) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	var endpoint *Endpoint
+
+	switch req.Method {
+	case "DELETE":
+		endpoint = e.Delete
+	case "HEAD":
+		endpoint = e.Head
+	case "GET":
+		endpoint = e.Get
+	case "OPTIONS":
+		endpoint = e.Options
+	case "POST":
+		endpoint = e.Post
+	case "PUT":
+		endpoint = e.Put
+	case "PATCH":
+		endpoint = e.Patch
+	case "TRACE":
+		endpoint = e.Trace
+	case "CONNECT":
+		endpoint = e.Connect
+	}
+
+	if endpoint == nil || endpoint.Handler == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	switch v:= endpoint.Handler.(type){
+	case func( w http.ResponseWriter, req *http.Request) :
+		v(w, req)
+	case http.HandlerFunc:
+		v(w, req)
+	case http.Handler:
+		v.ServeHTTP(w, req)
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+		io.WriteString(w, "Handler is not a standard http handler")
+	}
 }
 
 // Walk calls the specified function for each method defined within the Endpoints

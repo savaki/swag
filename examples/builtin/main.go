@@ -6,11 +6,10 @@ import (
 
 	"github.com/savaki/swag"
 	"github.com/savaki/swag/endpoint"
-	"github.com/savaki/swag/swagger"
 )
 
-func handle(w http.ResponseWriter, _ *http.Request) {
-	io.WriteString(w, "Insert your code here")
+func handle(w http.ResponseWriter, req *http.Request) {
+	io.WriteString(w, req.Method+" - Insert your code here")
 }
 
 // Category example from the swagger pet store
@@ -45,10 +44,9 @@ func main() {
 		swag.Endpoints(post, get),
 	)
 
-	api.Walk(func(path string, endpoint *swagger.Endpoint) {
-		h := endpoint.Handler.(http.HandlerFunc)
-		http.Handle(path, h)
-	})
+	for path, endpoints := range api.Paths {
+		http.Handle(path, endpoints)
+	}
 
 	enableCors := true
 	http.Handle("/swagger", api.Handler(enableCors))
