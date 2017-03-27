@@ -1,4 +1,4 @@
-package types
+package swagger
 
 type Items struct {
 	Type   string `json:"type,omitempty"`
@@ -34,7 +34,7 @@ type Endpoint struct {
 	Method      string              `json:"-"`
 	Summary     string              `json:"summary,omitempty"`
 	Description string              `json:"description,omitempty"`
-	OperationId string              `json:"operationId"`
+	OperationId string              `json:"operationId,omitempty"`
 	Produces    []string            `json:"produces,omitempty"`
 	Consumes    []string            `json:"consumes,omitempty"`
 	Handler     interface{}         `json:"-"`

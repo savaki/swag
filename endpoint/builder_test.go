@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/savaki/swaggering/endpoint"
-	"github.com/savaki/swaggering/types"
+	"github.com/savaki/swaggering/swagger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -72,7 +72,7 @@ func TestConsumes(t *testing.T) {
 }
 
 func TestPath(t *testing.T) {
-	expected := types.Parameter{
+	expected := swagger.Parameter{
 		In:          "path",
 		Name:        "id",
 		Description: "the description",
@@ -89,7 +89,7 @@ func TestPath(t *testing.T) {
 }
 
 func TestQuery(t *testing.T) {
-	expected := types.Parameter{
+	expected := swagger.Parameter{
 		In:          "query",
 		Name:        "id",
 		Description: "the description",
@@ -110,10 +110,11 @@ type Model struct {
 }
 
 func TestBody(t *testing.T) {
-	expected := types.Parameter{
+	expected := swagger.Parameter{
+		In:          "body",
 		Description: "the description",
 		Required:    true,
-		Schema: &types.Schema{
+		Schema: &swagger.Schema{
 			Type:      "object",
 			Ref:       "#/definitions/endpoint_testModel",
 			Prototype: Model{},
@@ -129,9 +130,9 @@ func TestBody(t *testing.T) {
 }
 
 func TestResponse(t *testing.T) {
-	expected := types.Response{
+	expected := swagger.Response{
 		Description: "successful",
-		Schema: &types.Schema{
+		Schema: &swagger.Schema{
 			Type:      "object",
 			Ref:       "#/definitions/endpoint_testModel",
 			Prototype: Model{},

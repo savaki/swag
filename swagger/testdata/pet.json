@@ -1,5 +1,5 @@
 {
-  "swaggeringPerson": {
+  "swaggerPerson": {
     "type": "object",
     "properties": {
       "First": {
@@ -7,7 +7,7 @@
       }
     }
   },
-  "swaggeringPet": {
+  "swaggerPet": {
     "type": "object",
     "required": [
       "pointer"
@@ -34,21 +34,21 @@
         }
       },
       "friend": {
-        "$ref": "#/definitions/swaggeringPerson"
+        "$ref": "#/definitions/swaggerPerson"
       },
       "friends": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/swaggeringPerson"
+          "$ref": "#/definitions/swaggerPerson"
         }
       },
       "pointer": {
-        "$ref": "#/definitions/swaggeringPerson"
+        "$ref": "#/definitions/swaggerPerson"
       },
       "pointers": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/swaggeringPerson"
+          "$ref": "#/definitions/swaggerPerson"
         }
       }
     }

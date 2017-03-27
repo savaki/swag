@@ -5,9 +5,11 @@ import (
 	"net/http"
 
 	"github.com/savaki/swaggering"
+	"github.com/savaki/swaggering/endpoint"
+	"github.com/savaki/swaggering/swagger"
 )
 
-func echo(w http.ResponseWriter, req *http.Request) {
+func echo(w http.ResponseWriter, _ *http.Request) {
 	io.WriteString(w, "Hello World")
 }
 
@@ -25,25 +27,22 @@ type Pet struct {
 }
 
 func main() {
-	endpoint := swaggering.NewEndpoint("post", "/", echo).
-		Summary("Add a new pet to the store").
-		Description("Additional information on adding a pet to the store").
-		Body(Pet{}, "Pet object that needs to be added to the store", true).
-		Response(http.StatusOK, Pet{}, "Successfully added pet").
-		Endpoint
+	e := endpoint.New("post", "/", echo,
+		endpoint.Summary("Add a new pet to the store"),
+		endpoint.Description("Additional information on adding a pet to the store"),
+		endpoint.Body(Pet{}, "Pet object that needs to be added to the store", true),
+		endpoint.Response(http.StatusOK, Pet{}, "Successfully added pet"),
+	).Build()
 
-	api := &swaggering.OldApi{
-		BasePath: "/api",
-		CORS:     true,
-		Endpoints: []swaggering.OldEndpoint{
-			endpoint,
-		},
-	}
+	api := swaggering.New(
+		swaggering.Endpoints(e),
+	).Build()
 
-	api.Walk(func(path string, endpoint *swaggering.Endpoints) {
-		http.Handle(path, endpoint)
+	api.Walk(func(path string, endpoint *swagger.Endpoint) {
+		h := endpoint.Handler.(http.HandlerFunc)
+		http.Handle(path, h)
 	})
 
-	http.Handle("/swagger", api)
+	http.Handle("/swagger", api.Handler(true))
 	http.ListenAndServe(":8080", nil)
 }

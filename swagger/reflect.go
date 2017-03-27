@@ -1,40 +1,12 @@
-package endpoint
+package swagger
 
 import (
 	"reflect"
 	"strings"
-
-	"github.com/savaki/swaggering/types"
 )
 
-type object struct {
-	IsArray    bool                `json:"-"`
-	GoType     reflect.Type        `json:"-"`
-	Name       string              `json:"-"`
-	Type       string              `json:"type"`
-	Required   []string            `json:"required,omitempty"`
-	Properties map[string]property `json:"properties,omitempty"`
-}
-
-type items struct {
-	Type   string `json:"type,omitempty"`
-	Format string `json:"format,omitempty"`
-	Ref    string `json:"$ref,omitempty"`
-}
-
-type property struct {
-	GoType      reflect.Type `json:"-"`
-	Type        string       `json:"type,omitempty"`
-	Description string       `json:"description,omitempty"`
-	Enum        []string     `json:"enum,omitempty"`
-	Format      string       `json:"format,omitempty"`
-	Ref         string       `json:"$ref,omitempty"`
-	Example     string       `json:"example,omitempty"`
-	Items       *items       `json:"items,omitempty"`
-}
-
-func inspect(t reflect.Type, jsonTag string) property {
-	p := property{
+func inspect(t reflect.Type, jsonTag string) Property {
+	p := Property{
 		GoType: t,
 	}
 
@@ -77,7 +49,7 @@ func inspect(t reflect.Type, jsonTag string) property {
 
 	case reflect.Slice:
 		p.Type = "array"
-		p.Items = &items{}
+		p.Items = &Items{}
 
 		p.GoType = t.Elem() // dereference the slice
 		switch p.GoType.Kind() {
@@ -114,7 +86,7 @@ func inspect(t reflect.Type, jsonTag string) property {
 	return p
 }
 
-func defineObject(v interface{}) object {
+func defineObject(v interface{}) Object {
 	var required []string
 
 	var t reflect.Type
@@ -125,10 +97,13 @@ func defineObject(v interface{}) object {
 		t = reflect.TypeOf(v)
 	}
 
-	properties := map[string]property{}
+	properties := map[string]Property{}
 	isArray := t.Kind() == reflect.Slice
 
 	if isArray {
+		t = t.Elem()
+	}
+	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
 
@@ -165,7 +140,7 @@ func defineObject(v interface{}) object {
 		properties[name] = p
 	}
 
-	return object{
+	return Object{
 		IsArray:    isArray,
 		GoType:     t,
 		Type:       "object",
@@ -175,15 +150,42 @@ func defineObject(v interface{}) object {
 	}
 }
 
-func makeSchema(v interface{}) *types.Schema {
-	schema := &types.Schema{
+func define(v interface{}) map[string]Object {
+	objMap := map[string]Object{}
+
+	obj := defineObject(v)
+	objMap[obj.Name] = obj
+
+	dirty := true
+
+	for dirty {
+		dirty = false
+		for _, d := range objMap {
+			for _, p := range d.Properties {
+				if p.GoType.Kind() == reflect.Struct {
+					name := makeName(p.GoType)
+					if _, exists := objMap[name]; !exists {
+						child := defineObject(p.GoType)
+						objMap[child.Name] = child
+						dirty = true
+					}
+				}
+			}
+		}
+	}
+
+	return objMap
+}
+
+func MakeSchema(v interface{}) *Schema {
+	schema := &Schema{
 		Prototype: v,
 	}
 
 	obj := defineObject(v)
 	if obj.IsArray {
 		schema.Type = "array"
-		schema.Items = &types.Items{
+		schema.Items = &Items{
 			Ref: makeRef(obj.Name),
 		}
 

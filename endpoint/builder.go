@@ -1,14 +1,19 @@
 package endpoint
 
 import (
+	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/savaki/swaggering/types"
+	"github.com/savaki/swaggering/swagger"
 )
 
 type Builder struct {
-	Endpoint *types.Endpoint
+	Endpoint *swagger.Endpoint
+}
+
+func (b *Builder) Build() *swagger.Endpoint {
+	return b.Endpoint
 }
 
 type Option func(builder *Builder)
@@ -43,10 +48,10 @@ func Consumes(v ...string) Option {
 	}
 }
 
-func parameter(p types.Parameter) Option {
+func parameter(p swagger.Parameter) Option {
 	return func(b *Builder) {
 		if b.Endpoint.Parameters == nil {
-			b.Endpoint.Parameters = []types.Parameter{}
+			b.Endpoint.Parameters = []swagger.Parameter{}
 		}
 
 		b.Endpoint.Parameters = append(b.Endpoint.Parameters, p)
@@ -54,7 +59,7 @@ func parameter(p types.Parameter) Option {
 }
 
 func Path(name, typ, description string, required bool) Option {
-	p := types.Parameter{
+	p := swagger.Parameter{
 		Name:        name,
 		In:          "path",
 		Type:        typ,
@@ -65,7 +70,7 @@ func Path(name, typ, description string, required bool) Option {
 }
 
 func Query(name, typ, description string, required bool) Option {
-	p := types.Parameter{
+	p := swagger.Parameter{
 		Name:        name,
 		In:          "query",
 		Type:        typ,
@@ -76,9 +81,10 @@ func Query(name, typ, description string, required bool) Option {
 }
 
 func Body(prototype interface{}, description string, required bool) Option {
-	p := types.Parameter{
+	p := swagger.Parameter{
+		In:          "body",
 		Description: description,
-		Schema:      makeSchema(prototype),
+		Schema:      swagger.MakeSchema(prototype),
 		Required:    required,
 	}
 	return parameter(p)
@@ -97,20 +103,24 @@ func Tags(tags ...string) Option {
 func Response(code int, prototype interface{}, description string) Option {
 	return func(b *Builder) {
 		if b.Endpoint.Responses == nil {
-			b.Endpoint.Responses = map[string]types.Response{}
+			b.Endpoint.Responses = map[string]swagger.Response{}
 		}
 
-		b.Endpoint.Responses[strconv.Itoa(code)] = types.Response{
+		b.Endpoint.Responses[strconv.Itoa(code)] = swagger.Response{
 			Description: description,
-			Schema:      makeSchema(prototype),
+			Schema:      swagger.MakeSchema(prototype),
 		}
 	}
 }
 
 func New(method, path string, handler interface{}, options ...Option) *Builder {
+	if v, ok := handler.(func(w http.ResponseWriter, r *http.Request)); ok {
+		handler = http.HandlerFunc(v)
+	}
+
 	method = strings.ToUpper(method)
 	e := &Builder{
-		Endpoint: &types.Endpoint{
+		Endpoint: &swagger.Endpoint{
 			Method:   method,
 			Path:     path,
 			Handler:  handler,
