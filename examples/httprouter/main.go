@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/revel/revel"
 	"github.com/savaki/swag"
 	"github.com/savaki/swag/endpoint"
 	"github.com/savaki/swag/swagger"
@@ -26,10 +25,6 @@ type Pet struct {
 	Name      string   `json:"name"`
 	PhotoUrls []string `json:"photoUrls"`
 	Tags      []string `json:"tags"`
-}
-
-type MyController struct {
-	*revel.Controller
 }
 
 func main() {
