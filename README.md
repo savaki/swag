@@ -67,3 +67,13 @@ func main() {
 }
 ```
 
+## Additional Examples
+
+Examples for popular web frameworks can be found in the examples directory:
+
+* [http.Server](examples/builtin/main.go)
+* [Echo](examples/echo/main.go)
+* [Gin](examples/gin/main.go)
+* [Gorilla](examples/gorilla/main.go)
+* [httprouter](examples/httprouter/main.go)
+
