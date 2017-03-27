@@ -1,8 +1,10 @@
-package swaggering
+package endpoint
 
 import (
 	"reflect"
 	"strings"
+
+	"github.com/savaki/swaggering/types"
 )
 
 type object struct {
@@ -14,6 +16,12 @@ type object struct {
 	Properties map[string]property `json:"properties,omitempty"`
 }
 
+type items struct {
+	Type   string `json:"type,omitempty"`
+	Format string `json:"format,omitempty"`
+	Ref    string `json:"$ref,omitempty"`
+}
+
 type property struct {
 	GoType      reflect.Type `json:"-"`
 	Type        string       `json:"type,omitempty"`
@@ -22,25 +30,7 @@ type property struct {
 	Format      string       `json:"format,omitempty"`
 	Ref         string       `json:"$ref,omitempty"`
 	Example     string       `json:"example,omitempty"`
-	Items       *Items       `json:"items,omitempty"`
-}
-
-func makeSchema(v interface{}) *Schema {
-	schema := &Schema{}
-
-	obj := defineObject(v)
-	if obj.IsArray {
-		schema.Type = "array"
-		schema.Items = &Items{
-			Ref: makeRef(obj.Name),
-		}
-
-	} else {
-		schema.Type = "object"
-		schema.Ref = makeRef(obj.Name)
-	}
-
-	return schema
+	Items       *items       `json:"items,omitempty"`
 }
 
 func inspect(t reflect.Type, jsonTag string) property {
@@ -87,7 +77,7 @@ func inspect(t reflect.Type, jsonTag string) property {
 
 	case reflect.Slice:
 		p.Type = "array"
-		p.Items = &OldItems{}
+		p.Items = &items{}
 
 		p.GoType = t.Elem() // dereference the slice
 		switch p.GoType.Kind() {
@@ -185,29 +175,22 @@ func defineObject(v interface{}) object {
 	}
 }
 
-func define(v interface{}) map[string]object {
-	objMap := map[string]object{}
-
-	obj := defineObject(v)
-	objMap[obj.Name] = obj
-
-	dirty := true
-
-	for dirty {
-		dirty = false
-		for _, d := range objMap {
-			for _, p := range d.Properties {
-				if p.GoType.Kind() == reflect.Struct {
-					name := makeName(p.GoType)
-					if _, exists := objMap[name]; !exists {
-						child := defineObject(p.GoType)
-						objMap[child.Name] = child
-						dirty = true
-					}
-				}
-			}
-		}
+func makeSchema(v interface{}) *types.Schema {
+	schema := &types.Schema{
+		Prototype: v,
 	}
 
-	return objMap
+	obj := defineObject(v)
+	if obj.IsArray {
+		schema.Type = "array"
+		schema.Items = &types.Items{
+			Ref: makeRef(obj.Name),
+		}
+
+	} else {
+		schema.Type = "object"
+		schema.Ref = makeRef(obj.Name)
+	}
+
+	return schema
 }

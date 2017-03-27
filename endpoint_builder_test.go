@@ -20,7 +20,9 @@ type Session struct {
 }
 
 func TestBuilder(t *testing.T) {
-	b := swaggering.NewEndpoint("get", "/", nil).
+	b := swaggering.NewEndpoint("get", "/", "the summary", nil,
+		swaggering.EndpointDescription("the description"),
+	).
 		Summary("the summary").
 		Description("the description").
 		Tags("tag1", "tag2").
@@ -31,13 +33,13 @@ func TestBuilder(t *testing.T) {
 
 	data, err := json.Marshal(b.Endpoint)
 	assert.Nil(t, err)
-	endpoint := swaggering.Endpoint{}
+	endpoint := swaggering.OldEndpoint{}
 	err = json.Unmarshal(data, &endpoint)
 	assert.Nil(t, err)
 
 	data, err = ioutil.ReadFile("testdata/builder.json")
 	assert.Nil(t, err)
-	expected := swaggering.Endpoint{}
+	expected := swaggering.OldEndpoint{}
 	err = json.Unmarshal(data, &expected)
 	assert.Nil(t, err)
 

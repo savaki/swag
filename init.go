@@ -7,63 +7,13 @@ import (
 	"sync"
 )
 
-func (api *Api) initSwagger() *SwaggerApi {
-	s := &SwaggerApi{
-		BasePath: "/",
-		Swagger:  "2.0",
-		Schemes:  []string{"http"},
-		Tags:     api.Tags,
-		Host:     api.Host,
-	}
-
-	s.Info.Contact.Email = "your-email-address"
-	s.Info.Description = "Describe your API"
-	s.Info.Title = "Your API Title"
-	s.Info.Version = "SNAPSHOT"
-	s.Info.TermsOfService = "http://swagger.io/terms/"
-	s.Info.License.Name = "Apache 2.0"
-	s.Info.License.Url = "http://www.apache.org/licenses/LICENSE-2.0.html"
-
-	// override with user provided values
-
-	if api.Description != "" {
-		s.Info.Description = api.Description
-	}
-	if api.Version != "" {
-		s.Info.Version = api.Version
-	}
-	if api.TermsOfService != "" {
-		s.Info.TermsOfService = api.TermsOfService
-	}
-	if api.Title != "" {
-		s.Info.Title = api.Title
-	}
-	if api.Email != "" {
-		s.Info.Contact.Email = api.Email
-	}
-	if api.LicenseName != "" {
-		s.Info.License.Name = api.LicenseName
-	}
-	if api.LicenseUrl != "" {
-		s.Info.License.Url = api.LicenseUrl
-	}
-	if api.BasePath != "" {
-		s.BasePath = api.BasePath
-	}
-	if api.Schemes != nil {
-		s.Schemes = api.Schemes
-	}
-
-	return s
-}
-
-func (api *Api) initSchema(v interface{}) *SwaggerSchema {
-	schema := &SwaggerSchema{}
+func (api *OldApi) initSchema(v interface{}) *Schema {
+	schema := &Schema{}
 
 	obj := defineObject(v)
 	if obj.IsArray {
 		schema.Type = "array"
-		schema.Items = &SwaggerItems{
+		schema.Items = &Items{
 			Ref: makeRef(obj.Name),
 		}
 
@@ -75,8 +25,8 @@ func (api *Api) initSchema(v interface{}) *SwaggerSchema {
 	return schema
 }
 
-func (api *Api) initParameter(parameter Parameter) SwaggerParameter {
-	p := SwaggerParameter{
+func (api *OldApi) initParameter(parameter OldParameter) Parameter {
+	p := Parameter{
 		In:          parameter.In,
 		Name:        parameter.Name,
 		Description: parameter.Description,
@@ -103,9 +53,9 @@ func (api *Api) initParameter(parameter Parameter) SwaggerParameter {
 	return p
 }
 
-func (api *Api) initResponse(code int, response Response) (string, SwaggerResponse) {
+func (api *OldApi) initResponse(code int, response OldResponse) (string, Response) {
 	sc := fmt.Sprintf("%v", code)
-	r := SwaggerResponse{
+	r := Response{
 		Description: response.Description,
 	}
 
@@ -116,8 +66,8 @@ func (api *Api) initResponse(code int, response Response) (string, SwaggerRespon
 	return sc, r
 }
 
-func (api *Api) initEndpoint(endpoint Endpoint) *SwaggerEndpoint {
-	se := &SwaggerEndpoint{
+func (api *OldApi) initEndpoint(endpoint OldEndpoint) *Endpoint {
+	se := &Endpoint{
 		Tags:        endpoint.Tags,
 		Path:        endpoint.Path,
 		Method:      strings.ToLower(endpoint.Method),
@@ -138,21 +88,21 @@ func (api *Api) initEndpoint(endpoint Endpoint) *SwaggerEndpoint {
 
 	// assign the handler
 	if endpoint.Handler != nil {
-		se.HandlerFunc = endpoint.Handler.ServeHTTP
+		se.Handler = endpoint.Handler.ServeHTTP
 	} else {
-		se.HandlerFunc = endpoint.HandlerFunc
+		se.Handler = endpoint.HandlerFunc
 	}
 
 	// handle the parameters
 	if endpoint.Parameters != nil {
-		se.Parameters = []SwaggerParameter{}
+		se.Parameters = []Parameter{}
 		for _, p := range endpoint.Parameters {
 			se.Parameters = append(se.Parameters, api.initParameter(p))
 		}
 	}
 
 	// handle the responses
-	se.Responses = map[string]SwaggerResponse{}
+	se.Responses = map[string]Response{}
 	for code, response := range endpoint.Responses {
 		sc, r := api.initResponse(code, response)
 		se.Responses[sc] = r
@@ -161,8 +111,8 @@ func (api *Api) initEndpoint(endpoint Endpoint) *SwaggerEndpoint {
 	return se
 }
 
-func (api *Api) initDefinitions() map[string]Object {
-	definitions := map[string]Object{}
+func (api *OldApi) initDefinitions() map[string]object {
+	definitions := map[string]object{}
 	objects := []interface{}{}
 
 	// collect all the objects from all the endpoints
@@ -195,15 +145,15 @@ func (api *Api) initDefinitions() map[string]Object {
 	return definitions
 }
 
-func (api *Api) initOnce() {
+func (api *OldApi) initOnce() {
 	// initialize properties that haven't been set
 	//
 	api.mux = &sync.Mutex{}
-	api.byHostAndScheme = map[string]*SwaggerApi{}
+	api.byHostAndScheme = map[string]*Api{}
 
 	// render the input into the swagger model
 	//
-	api.template = api.initSwagger()
+	//api.template = api.initSwagger()
 
 	for _, endpoint := range api.Endpoints {
 		se := api.initEndpoint(endpoint)
@@ -213,6 +163,6 @@ func (api *Api) initOnce() {
 	api.template.Definitions = api.initDefinitions()
 }
 
-func (api *Api) init() {
+func (api *OldApi) init() {
 	api.once.Do(api.initOnce)
 }

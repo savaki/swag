@@ -42,7 +42,7 @@ func TestDefine(t *testing.T) {
 		assert.False(t, obj.IsArray)
 		assert.Equal(t, 8, len(obj.Properties))
 
-		content := map[string]Object{}
+		content := map[string]object{}
 		data, err := ioutil.ReadFile("testdata/pet.json")
 		assert.Nil(t, err)
 		err = json.NewDecoder(bytes.NewReader(data)).Decode(&content)

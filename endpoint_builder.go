@@ -1,7 +1,7 @@
 package swaggering
 
 import (
-	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -9,36 +9,43 @@ type EndpointBuilder struct {
 	Endpoint Endpoint
 }
 
-func (b *EndpointBuilder) Handler(h http.Handler) *EndpointBuilder {
-	b.Endpoint.Handler = h
-	return b
-}
+type EndpointOption func(builder *EndpointBuilder)
 
-func (b *EndpointBuilder) Func(v interface{}) *EndpointBuilder {
-	b.Endpoint.Func = v
-	return b
-}
-
-func (b *EndpointBuilder) Summary(v string) *EndpointBuilder {
-	b.Endpoint.Summary = v
-	return b
-}
-
-func (b *EndpointBuilder) Description(v string) *EndpointBuilder {
-	b.Endpoint.Description = v
-	return b
-}
-
-func (b *EndpointBuilder) Parameter(p Parameter) *EndpointBuilder {
-	if b.Endpoint.Parameters == nil {
-		b.Endpoint.Parameters = []Parameter{}
+func EndpointDescription(v string) EndpointOption {
+	return func(b *EndpointBuilder) {
+		b.Endpoint.Description = v
 	}
-
-	b.Endpoint.Parameters = append(b.Endpoint.Parameters, p)
-	return b
 }
 
-func (b *EndpointBuilder) Path(name, typ, description string, required bool) *EndpointBuilder {
+func OperationId(v string) EndpointOption {
+	return func(b *EndpointBuilder) {
+		b.Endpoint.OperationId = v
+	}
+}
+
+func Produces(v ...string) EndpointOption {
+	return func(b *EndpointBuilder) {
+		b.Endpoint.Produces = v
+	}
+}
+
+func Consumes(v ...string) EndpointOption {
+	return func(b *EndpointBuilder) {
+		b.Endpoint.Consumes = v
+	}
+}
+
+func parameter(p Parameter) EndpointOption {
+	return func(b *EndpointBuilder) {
+		if b.Endpoint.Parameters == nil {
+			b.Endpoint.Parameters = []Parameter{}
+		}
+
+		b.Endpoint.Parameters = append(b.Endpoint.Parameters, p)
+	}
+}
+
+func (b *EndpointBuilder) Path(name, typ, description string, required bool) EndpointOption {
 	p := Parameter{
 		Name:        name,
 		In:          "path",
@@ -46,10 +53,10 @@ func (b *EndpointBuilder) Path(name, typ, description string, required bool) *En
 		Description: description,
 		Required:    required,
 	}
-	return b.Parameter(p)
+	return parameter(p)
 }
 
-func (b *EndpointBuilder) Query(name, typ, description string, required bool) *EndpointBuilder {
+func (b *EndpointBuilder) Query(name, typ, description string, required bool) EndpointOption {
 	p := Parameter{
 		Name:        name,
 		In:          "query",
@@ -57,47 +64,57 @@ func (b *EndpointBuilder) Query(name, typ, description string, required bool) *E
 		Description: description,
 		Required:    required,
 	}
-	return b.Parameter(p)
+	return parameter(p)
 }
 
-func (b *EndpointBuilder) Body(schema interface{}, description string, required bool) *EndpointBuilder {
+func (b *EndpointBuilder) Body(prototype interface{}, description string, required bool) EndpointOption {
 	p := Parameter{
 		Description: description,
-		Schema:      schema,
+		Schema:      makeSchema(prototype),
 		Required:    required,
 	}
-	return b.Parameter(p)
+	return parameter(p)
 }
 
-func (b *EndpointBuilder) Tags(tags ...string) *EndpointBuilder {
-	if b.Endpoint.Tags == nil {
-		b.Endpoint.Tags = []string{}
-	}
+func Tags(tags ...string) EndpointOption {
+	return func(b *EndpointBuilder) {
+		if b.Endpoint.Tags == nil {
+			b.Endpoint.Tags = []string{}
+		}
 
-	b.Endpoint.Tags = append(b.Endpoint.Tags, tags...)
-	return b
+		b.Endpoint.Tags = append(b.Endpoint.Tags, tags...)
+	}
 }
 
-func (b *EndpointBuilder) Response(code int, schema interface{}, description string) *EndpointBuilder {
-	if b.Endpoint.Responses == nil {
-		b.Endpoint.Responses = map[int]Response{}
-	}
+func Respond(code int, prototype interface{}, description string) EndpointOption {
+	return func(b *EndpointBuilder) {
+		if b.Endpoint.Responses == nil {
+			b.Endpoint.Responses = map[string]Response{}
+		}
 
-	b.Endpoint.Responses[code] = Response{
-		Description: description,
-		Schema:      schema,
+		b.Endpoint.Responses[strconv.Itoa(code)] = Response{
+			Description: description,
+			Schema:      makeSchema(prototype),
+		}
 	}
-
-	return b
 }
 
-func NewEndpoint(method, path string, handler interface{}) *EndpointBuilder {
+func NewEndpoint(method, path, summary string, handler interface{}, options ...EndpointOption) *EndpointBuilder {
 	method = strings.ToUpper(method)
-	return &EndpointBuilder{
+	e := &EndpointBuilder{
 		Endpoint: Endpoint{
-			Method: method,
-			Path:   path,
-			Func:   handler,
+			Method:   method,
+			Path:     path,
+			Summary:  summary,
+			Handler:  handler,
+			Produces: []string{"application/json"},
+			Consumes: []string{"application/json"},
 		},
 	}
+
+	for _, opt := range options {
+		opt(e)
+	}
+
+	return e
 }

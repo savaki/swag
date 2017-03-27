@@ -39,8 +39,8 @@ func TestOnce(t *testing.T) {
 }
 
 func TestServeHTTP_SetsProducerAndConsumer(t *testing.T) {
-	api := &swaggering.Api{
-		Endpoints: swaggering.Endpoints{
+	api := &swaggering.OldApi{
+		Endpoints: swaggering.OldEndpoints{
 			{
 				Method: "get",
 				Path:   "/",
@@ -52,7 +52,7 @@ func TestServeHTTP_SetsProducerAndConsumer(t *testing.T) {
 	req, _ := http.NewRequest("GET", "https://example.com", nil)
 	api.ServeHTTP(w, req)
 
-	content := &swaggering.SwaggerApi{}
+	content := &swaggering.Api{}
 	err := json.Unmarshal(w.Body.Bytes(), content)
 	if err != nil {
 		t.Errorf("unable to unmarshal content - %v", err)
@@ -86,7 +86,7 @@ func TestServeHTTP_SetsProducerAndConsumer(t *testing.T) {
 }
 
 func TestServeHTTP_SetsHostAndScheme(t *testing.T) {
-	api := &swaggering.Api{}
+	api := &swaggering.OldApi{}
 
 	// test from one host
 	//
@@ -95,7 +95,7 @@ func TestServeHTTP_SetsHostAndScheme(t *testing.T) {
 	req, _ := http.NewRequest("GET", "https://example.com", nil)
 	api.ServeHTTP(w, req)
 
-	content := &swaggering.SwaggerApi{}
+	content := &swaggering.Api{}
 	err := json.Unmarshal(w.Body.Bytes(), content)
 	if err != nil {
 		t.Errorf("unable to unmarshal content - %v", err)
@@ -124,7 +124,7 @@ func TestServeHTTP_SetsHostAndScheme(t *testing.T) {
 	req, _ = http.NewRequest("GET", "http://othersite.com", nil)
 	api.ServeHTTP(w, req)
 
-	content = &swaggering.SwaggerApi{}
+	content = &swaggering.Api{}
 	err = json.Unmarshal(w.Body.Bytes(), content)
 	if err != nil {
 		t.Errorf("unable to unmarshal content - %v", err)

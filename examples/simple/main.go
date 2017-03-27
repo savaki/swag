@@ -32,15 +32,15 @@ func main() {
 		Response(http.StatusOK, Pet{}, "Successfully added pet").
 		Endpoint
 
-	api := &swaggering.Api{
+	api := &swaggering.OldApi{
 		BasePath: "/api",
 		CORS:     true,
-		Endpoints: []swaggering.Endpoint{
+		Endpoints: []swaggering.OldEndpoint{
 			endpoint,
 		},
 	}
 
-	api.Walk(func(path string, endpoint *swaggering.SwaggerEndpoints) {
+	api.Walk(func(path string, endpoint *swaggering.Endpoints) {
 		http.Handle(path, endpoint)
 	})
 

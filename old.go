@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-type Tag struct {
+type OldTag struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Docs        struct {
@@ -16,7 +16,7 @@ type Tag struct {
 	} `json:"externalDocs"`
 }
 
-type Parameter struct {
+type OldParameter struct {
 	In          string
 	Name        string
 	Description string
@@ -26,12 +26,12 @@ type Parameter struct {
 	Format      string
 }
 
-type Response struct {
+type OldResponse struct {
 	Description string
 	Schema      interface{}
 }
 
-type Endpoint struct {
+type OldEndpoint struct {
 	Tags        []string
 	Method      string
 	Path        string
@@ -41,15 +41,15 @@ type Endpoint struct {
 	HandlerFunc http.HandlerFunc `json:"-"`
 	Produces    []string
 	Consumes    []string
-	Parameters  []Parameter
-	Responses   map[int]Response
+	Parameters  []OldParameter
+	Responses   map[int]OldResponse
 
 	// Value is a container for arbitrary content to provide support for non net/http web frameworks
 	// like gin
 	Func interface{} `json:"-"`
 }
 
-func (e *Endpoint) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (e *OldEndpoint) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if e.Handler != nil {
 		e.Handler.ServeHTTP(w, req)
 	} else if e.HandlerFunc != nil {
@@ -59,13 +59,13 @@ func (e *Endpoint) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-type Endpoints []Endpoint
+type OldEndpoints []OldEndpoint
 
-func (e Endpoints) Append(endpoints ...Endpoint) Endpoints {
+func (e OldEndpoints) Append(endpoints ...OldEndpoint) OldEndpoints {
 	return append(e, endpoints...)
 }
 
-type Api struct {
+type OldApi struct {
 	Description    string
 	Version        string
 	TermsOfService string
@@ -75,19 +75,19 @@ type Api struct {
 	LicenseUrl     string
 	BasePath       string
 	Schemes        []string
-	Endpoints      []Endpoint
-	Tags           []Tag
+	Endpoints      []OldEndpoint
+	Tags           []OldTag
 	Host           string
 
 	// CORS indicates whether the swagger api should generate CORS * headers
 	CORS            bool
 	once            sync.Once
 	mux             *sync.Mutex
-	byHostAndScheme map[string]*SwaggerApi
-	template        *SwaggerApi
+	byHostAndScheme map[string]*Api
+	template        *Api
 }
 
-func (api *Api) Walk(callback func(path string, endpoints *SwaggerEndpoints)) {
+func (api *OldApi) Walk(callback func(path string, endpoints *Endpoints)) {
 	api.init()
 
 	for path, endpoints := range api.template.Paths {
@@ -95,7 +95,7 @@ func (api *Api) Walk(callback func(path string, endpoints *SwaggerEndpoints)) {
 	}
 }
 
-func (api *Api) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (api *OldApi) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	api.init()
 
 	if api.CORS {
