@@ -1,10 +1,8 @@
 package endpoint_test
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/savaki/swaggering/endpoint"
@@ -117,7 +115,7 @@ func TestBody(t *testing.T) {
 		Required:    true,
 		Schema: &types.Schema{
 			Type:      "object",
-			Ref:       "#/definitions/endpoint_testInput",
+			Ref:       "#/definitions/endpoint_testModel",
 			Prototype: Model{},
 		},
 	}
@@ -144,7 +142,6 @@ func TestResponse(t *testing.T) {
 		endpoint.Response(http.StatusOK, Model{}, "successful"),
 	).Endpoint
 
-	json.NewEncoder(os.Stdout).Encode(e.Responses)
 	assert.Equal(t, 1, len(e.Responses))
 	assert.Equal(t, expected, e.Responses["200"])
 }
