@@ -12,10 +12,6 @@ type Builder struct {
 	Endpoint *swagger.Endpoint
 }
 
-func (b *Builder) Build() *swagger.Endpoint {
-	return b.Endpoint
-}
-
 type Option func(builder *Builder)
 
 func Summary(v string) Option {
@@ -113,7 +109,7 @@ func Response(code int, prototype interface{}, description string) Option {
 	}
 }
 
-func New(method, path string, handler interface{}, options ...Option) *Builder {
+func New(method, path string, handler interface{}, options ...Option) *swagger.Endpoint {
 	if v, ok := handler.(func(w http.ResponseWriter, r *http.Request)); ok {
 		handler = http.HandlerFunc(v)
 	}
@@ -134,5 +130,5 @@ func New(method, path string, handler interface{}, options ...Option) *Builder {
 		opt(e)
 	}
 
-	return e
+	return e.Endpoint
 }

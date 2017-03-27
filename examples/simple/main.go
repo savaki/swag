@@ -27,16 +27,21 @@ type Pet struct {
 }
 
 func main() {
-	e := endpoint.New("post", "/", echo,
+	post := endpoint.New("post", "/pet", echo,
 		endpoint.Summary("Add a new pet to the store"),
 		endpoint.Description("Additional information on adding a pet to the store"),
 		endpoint.Body(Pet{}, "Pet object that needs to be added to the store", true),
 		endpoint.Response(http.StatusOK, Pet{}, "Successfully added pet"),
-	).Build()
+	)
+	get := endpoint.New("get", "/pet/{petId}", echo,
+		endpoint.Summary("Find pet by ID"),
+		endpoint.Path("petId", "integer", "ID of pet to return", true),
+		endpoint.Response(http.StatusOK, Pet{}, "successful operation"),
+	)
 
 	api := swag.New(
-		swag.Endpoints(e),
-	).Build()
+		swag.Endpoints(post, get),
+	)
 
 	api.Walk(func(path string, endpoint *swagger.Endpoint) {
 		h := endpoint.Handler.(http.HandlerFunc)

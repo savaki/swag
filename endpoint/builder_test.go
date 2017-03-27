@@ -18,7 +18,7 @@ func TestNew(t *testing.T) {
 	summary := "here's the summary"
 	e := endpoint.New("get", "/", Echo,
 		endpoint.Summary(summary),
-	).Endpoint
+	)
 
 	assert.Equal(t, "GET", e.Method)
 	assert.Equal(t, "/", e.Path)
@@ -32,7 +32,7 @@ func TestNew(t *testing.T) {
 func TestTags(t *testing.T) {
 	e := endpoint.New("get", "/", Echo,
 		endpoint.Tags("blah"),
-	).Endpoint
+	)
 
 	assert.Equal(t, []string{"blah"}, e.Tags)
 }
@@ -40,7 +40,7 @@ func TestTags(t *testing.T) {
 func TestDescription(t *testing.T) {
 	e := endpoint.New("get", "/", Echo,
 		endpoint.Description("blah"),
-	).Endpoint
+	)
 
 	assert.Equal(t, "blah", e.Description)
 }
@@ -48,7 +48,7 @@ func TestDescription(t *testing.T) {
 func TestOperationId(t *testing.T) {
 	e := endpoint.New("get", "/", Echo,
 		endpoint.OperationId("blah"),
-	).Endpoint
+	)
 
 	assert.Equal(t, "blah", e.OperationId)
 }
@@ -57,7 +57,7 @@ func TestProduces(t *testing.T) {
 	expected := []string{"a", "b"}
 	e := endpoint.New("get", "/", Echo,
 		endpoint.Produces(expected...),
-	).Endpoint
+	)
 
 	assert.Equal(t, expected, e.Produces)
 }
@@ -66,7 +66,7 @@ func TestConsumes(t *testing.T) {
 	expected := []string{"a", "b"}
 	e := endpoint.New("get", "/", Echo,
 		endpoint.Consumes(expected...),
-	).Endpoint
+	)
 
 	assert.Equal(t, expected, e.Consumes)
 }
@@ -82,7 +82,7 @@ func TestPath(t *testing.T) {
 
 	e := endpoint.New("get", "/", Echo,
 		endpoint.Path(expected.Name, expected.Type, expected.Description, expected.Required),
-	).Endpoint
+	)
 
 	assert.Equal(t, 1, len(e.Parameters))
 	assert.Equal(t, expected, e.Parameters[0])
@@ -99,7 +99,7 @@ func TestQuery(t *testing.T) {
 
 	e := endpoint.New("get", "/", Echo,
 		endpoint.Query(expected.Name, expected.Type, expected.Description, expected.Required),
-	).Endpoint
+	)
 
 	assert.Equal(t, 1, len(e.Parameters))
 	assert.Equal(t, expected, e.Parameters[0])
@@ -123,7 +123,7 @@ func TestBody(t *testing.T) {
 
 	e := endpoint.New("get", "/", Echo,
 		endpoint.Body(Model{}, expected.Description, expected.Required),
-	).Endpoint
+	)
 
 	assert.Equal(t, 1, len(e.Parameters))
 	assert.Equal(t, expected, e.Parameters[0])
@@ -141,7 +141,7 @@ func TestResponse(t *testing.T) {
 
 	e := endpoint.New("get", "/", Echo,
 		endpoint.Response(http.StatusOK, Model{}, "successful"),
-	).Endpoint
+	)
 
 	assert.Equal(t, 1, len(e.Responses))
 	assert.Equal(t, expected, e.Responses["200"])

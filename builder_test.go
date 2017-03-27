@@ -9,64 +9,64 @@ import (
 )
 
 func TestDescription(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.Description("blah"),
 	)
-	assert.Equal(t, "blah", builder.Api.Info.Description)
+	assert.Equal(t, "blah", api.Info.Description)
 }
 
 func TestVersion(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.Version("blah"),
 	)
-	assert.Equal(t, "blah", builder.Api.Info.Version)
+	assert.Equal(t, "blah", api.Info.Version)
 }
 
 func TestTermsOfService(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.TermsOfService("blah"),
 	)
-	assert.Equal(t, "blah", builder.Api.Info.TermsOfService)
+	assert.Equal(t, "blah", api.Info.TermsOfService)
 }
 
 func TestTitle(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.Title("blah"),
 	)
-	assert.Equal(t, "blah", builder.Api.Info.Title)
+	assert.Equal(t, "blah", api.Info.Title)
 }
 
 func TestContactEmail(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.ContactEmail("blah"),
 	)
-	assert.Equal(t, "blah", builder.Api.Info.Contact.Email)
+	assert.Equal(t, "blah", api.Info.Contact.Email)
 }
 
 func TestLicense(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.License("name", "url"),
 	)
-	assert.Equal(t, "name", builder.Api.Info.License.Name)
-	assert.Equal(t, "url", builder.Api.Info.License.Url)
+	assert.Equal(t, "name", api.Info.License.Name)
+	assert.Equal(t, "url", api.Info.License.Url)
 }
 
 func TestBasePath(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.BasePath("/"),
 	)
-	assert.Equal(t, "/", builder.Api.BasePath)
+	assert.Equal(t, "/", api.BasePath)
 }
 
 func TestSchemes(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.Schemes("blah"),
 	)
-	assert.Equal(t, []string{"blah"}, builder.Api.Schemes)
+	assert.Equal(t, []string{"blah"}, api.Schemes)
 }
 
 func TestTag(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.Tag("name", "desc",
 			swag.TagDescription("ext-desc"),
 			swag.TagUrl("ext-url"),
@@ -81,12 +81,12 @@ func TestTag(t *testing.T) {
 			Url:         "ext-url",
 		},
 	}
-	assert.Equal(t, expected, builder.Api.Tags[0])
+	assert.Equal(t, expected, api.Tags[0])
 }
 
 func TestHost(t *testing.T) {
-	builder := swag.New(
+	api := swag.New(
 		swag.Host("blah"),
 	)
-	assert.Equal(t, "blah", builder.Api.Host)
+	assert.Equal(t, "blah", api.Host)
 }

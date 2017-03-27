@@ -120,7 +120,7 @@ func Endpoints(endpoints ...*swagger.Endpoint) Option {
 }
 
 // New constructs a new api builder
-func New(options ...Option) *Builder {
+func New(options ...Option) *swagger.Api {
 	b := &Builder{
 		Api: &swagger.Api{
 			BasePath: "/",
@@ -146,9 +146,5 @@ func New(options ...Option) *Builder {
 		opt(b)
 	}
 
-	return b
-}
-
-func (b *Builder) Build() *swagger.Api {
 	return b.Api
 }
