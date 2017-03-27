@@ -7,6 +7,8 @@
  
 No code generation, no framework constraints, just a simple swagger definition.
 
+```swag``` is heavily geared towards generating REST/JSON apis.
+
 
 ## Installation
 
