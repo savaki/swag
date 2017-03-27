@@ -49,12 +49,15 @@ type Info struct {
 }
 
 type Endpoints struct {
-	Delete *Endpoint `json:"delete,omitempty"`
-	Head   *Endpoint `json:"head,omitempty"`
-	Get    *Endpoint `json:"get,omitempty"`
-	Option *Endpoint `json:"option,omitempty"`
-	Post   *Endpoint `json:"post,omitempty"`
-	Put    *Endpoint `json:"put,omitempty"`
+	Delete  *Endpoint `json:"delete,omitempty"`
+	Head    *Endpoint `json:"head,omitempty"`
+	Get     *Endpoint `json:"get,omitempty"`
+	Options *Endpoint `json:"options,omitempty"`
+	Post    *Endpoint `json:"post,omitempty"`
+	Put     *Endpoint `json:"put,omitempty"`
+	Patch   *Endpoint `json:"patch,omitempty"`
+	Trace   *Endpoint `json:"trace,omitempty"`
+	Connect *Endpoint `json:"connect,omitempty"`
 }
 
 func (e *Endpoints) Walk(fn func(endpoint *Endpoint)) {
@@ -67,14 +70,23 @@ func (e *Endpoints) Walk(fn func(endpoint *Endpoint)) {
 	if e.Get != nil {
 		fn(e.Get)
 	}
-	if e.Option != nil {
-		fn(e.Option)
+	if e.Options != nil {
+		fn(e.Options)
 	}
 	if e.Post != nil {
 		fn(e.Post)
 	}
 	if e.Put != nil {
 		fn(e.Put)
+	}
+	if e.Patch != nil {
+		fn(e.Patch)
+	}
+	if e.Trace != nil {
+		fn(e.Trace)
+	}
+	if e.Connect != nil {
+		fn(e.Connect)
 	}
 }
 
@@ -120,12 +132,18 @@ func (a *Api) addPath(e *Endpoint) {
 		v.Get = e
 	case "HEAD":
 		v.Head = e
-	case "OPTION":
-		v.Option = e
+	case "OPTIONS":
+		v.Options = e
 	case "POST":
 		v.Post = e
 	case "PUT":
 		v.Put = e
+	case "PATCH":
+		v.Patch = e
+	case "TRACE":
+		v.Trace = e
+	case "CONNECT":
+		v.Connect = e
 	default:
 		panic(fmt.Errorf("invalid method, %v", e.Method))
 	}
