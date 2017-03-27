@@ -43,6 +43,7 @@ func main() {
 	)
 
 	api := swag.New(
+		swag.BasePath("/api"),
 		swag.Endpoints(post, get),
 	)
 
