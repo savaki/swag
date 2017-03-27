@@ -17,4 +17,4 @@ go get github.com/savaki/swag
 
 ## Example
 
-The simplest way to get startewd
+The simplest way to get started
