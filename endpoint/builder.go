@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/savaki/swaggering/swagger"
+	"github.com/savaki/swag/swagger"
 )
 
 type Builder struct {

@@ -1,6 +1,6 @@
-package swaggering
+package swag
 
-import "github.com/savaki/swaggering/swagger"
+import "github.com/savaki/swag/swagger"
 
 type Builder struct {
 	Api *swagger.Api

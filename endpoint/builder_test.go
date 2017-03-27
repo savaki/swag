@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/savaki/swaggering/endpoint"
-	"github.com/savaki/swaggering/swagger"
+	"github.com/savaki/swag/endpoint"
+	"github.com/savaki/swag/swagger"
 	"github.com/stretchr/testify/assert"
 )
 

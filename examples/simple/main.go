@@ -4,9 +4,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/savaki/swaggering"
-	"github.com/savaki/swaggering/endpoint"
-	"github.com/savaki/swaggering/swagger"
+	"github.com/savaki/swag"
+	"github.com/savaki/swag/endpoint"
+	"github.com/savaki/swag/swagger"
 )
 
 func echo(w http.ResponseWriter, _ *http.Request) {
@@ -34,8 +34,8 @@ func main() {
 		endpoint.Response(http.StatusOK, Pet{}, "Successfully added pet"),
 	).Build()
 
-	api := swaggering.New(
-		swaggering.Endpoints(e),
+	api := swag.New(
+		swag.Endpoints(e),
 	).Build()
 
 	api.Walk(func(path string, endpoint *swagger.Endpoint) {
