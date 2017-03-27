@@ -48,7 +48,7 @@ func TestLicense(t *testing.T) {
 		swag.License("name", "url"),
 	)
 	assert.Equal(t, "name", api.Info.License.Name)
-	assert.Equal(t, "url", api.Info.License.Url)
+	assert.Equal(t, "url", api.Info.License.URL)
 }
 
 func TestBasePath(t *testing.T) {
@@ -69,7 +69,7 @@ func TestTag(t *testing.T) {
 	api := swag.New(
 		swag.Tag("name", "desc",
 			swag.TagDescription("ext-desc"),
-			swag.TagUrl("ext-url"),
+			swag.TagURL("ext-url"),
 		),
 	)
 
@@ -78,7 +78,7 @@ func TestTag(t *testing.T) {
 		Description: "desc",
 		Docs: swagger.Docs{
 			Description: "ext-desc",
-			Url:         "ext-url",
+			URL:         "ext-url",
 		},
 	}
 	assert.Equal(t, expected, api.Tags[0])

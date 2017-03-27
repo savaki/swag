@@ -13,13 +13,15 @@ func handle(w http.ResponseWriter, _ *http.Request) {
 	io.WriteString(w, "Insert your code here")
 }
 
+// Category example from the swagger pet store
 type Category struct {
-	Id   int64  `json:"category"`
+	ID   int64  `json:"category"`
 	Name string `json:"name"`
 }
 
+// Pet example from the swagger pet store
 type Pet struct {
-	Id        int64    `json:"id"`
+	ID        int64    `json:"id"`
 	Category  Category `json:"category"`
 	Name      string   `json:"name"`
 	PhotoUrls []string `json:"photoUrls"`

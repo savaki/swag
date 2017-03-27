@@ -177,12 +177,13 @@ func define(v interface{}) map[string]Object {
 	return objMap
 }
 
-func MakeSchema(v interface{}) *Schema {
+// MakeSchema takes struct or pointer to a struct and returns a Schema instance suitable for use by the swagger doc
+func MakeSchema(prototype interface{}) *Schema {
 	schema := &Schema{
-		Prototype: v,
+		Prototype: prototype,
 	}
 
-	obj := defineObject(v)
+	obj := defineObject(prototype)
 	if obj.IsArray {
 		schema.Type = "array"
 		schema.Items = &Items{

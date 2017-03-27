@@ -47,10 +47,10 @@ func TestDescription(t *testing.T) {
 
 func TestOperationId(t *testing.T) {
 	e := endpoint.New("get", "/", "get thing",
-		endpoint.OperationId("blah"),
+		endpoint.OperationID("blah"),
 	)
 
-	assert.Equal(t, "blah", e.OperationId)
+	assert.Equal(t, "blah", e.OperationID)
 }
 
 func TestProduces(t *testing.T) {

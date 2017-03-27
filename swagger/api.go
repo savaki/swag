@@ -10,6 +10,7 @@ import (
 	"sync"
 )
 
+// Object represents the object entity from the swagger definition
 type Object struct {
 	IsArray    bool                `json:"-"`
 	GoType     reflect.Type        `json:"-"`
@@ -19,6 +20,7 @@ type Object struct {
 	Properties map[string]Property `json:"properties,omitempty"`
 }
 
+// Property represents the property entity from the swagger definition
 type Property struct {
 	GoType      reflect.Type `json:"-"`
 	Type        string       `json:"type,omitempty"`
@@ -30,15 +32,18 @@ type Property struct {
 	Items       *Items       `json:"items,omitempty"`
 }
 
+// Contact represents the contact entity from the swagger definition; used by Info
 type Contact struct {
 	Email string `json:"email,omitempty"`
 }
 
+// License represents the license entity from the swagger definition; used by Info
 type License struct {
 	Name string `json:"name,omitempty"`
-	Url  string `json:"url,omitempty"`
+	URL  string `json:"url,omitempty"`
 }
 
+// Info represents the info entity from the swagger definition
 type Info struct {
 	Description    string  `json:"description,omitempty"`
 	Version        string  `json:"version,omitempty"`
@@ -48,6 +53,7 @@ type Info struct {
 	License        License `json:"license"`
 }
 
+// Endpoints represents all the swagger endpoints associated with a particular path
 type Endpoints struct {
 	Delete  *Endpoint `json:"delete,omitempty"`
 	Head    *Endpoint `json:"head,omitempty"`
@@ -60,6 +66,7 @@ type Endpoints struct {
 	Connect *Endpoint `json:"connect,omitempty"`
 }
 
+// Walk calls the specified function for each method defined within the Endpoints
 func (e *Endpoints) Walk(fn func(endpoint *Endpoint)) {
 	if e.Delete != nil {
 		fn(e.Delete)
@@ -90,7 +97,8 @@ func (e *Endpoints) Walk(fn func(endpoint *Endpoint)) {
 	}
 }
 
-type Api struct {
+// API provides the top level encapsulation for the swagger definition
+type API struct {
 	Swagger     string                `json:"swagger,omitempty"`
 	Info        Info                  `json:"info"`
 	BasePath    string                `json:"basePath,omitempty"`
@@ -101,8 +109,8 @@ type Api struct {
 	Host        string                `json:"host"`
 }
 
-func (a *Api) clone() *Api {
-	return &Api{
+func (a *API) clone() *API {
+	return &API{
 		Swagger:     a.Swagger,
 		Info:        a.Info,
 		BasePath:    a.BasePath,
@@ -114,7 +122,7 @@ func (a *Api) clone() *Api {
 	}
 }
 
-func (a *Api) addPath(e *Endpoint) {
+func (a *API) addPath(e *Endpoint) {
 	if a.Paths == nil {
 		a.Paths = map[string]*Endpoints{}
 	}
@@ -149,7 +157,7 @@ func (a *Api) addPath(e *Endpoint) {
 	}
 }
 
-func (a *Api) addDefinition(e *Endpoint) {
+func (a *API) addDefinition(e *Endpoint) {
 	if a.Definitions == nil {
 		a.Definitions = map[string]Object{}
 	}
@@ -181,19 +189,22 @@ func (a *Api) addDefinition(e *Endpoint) {
 	}
 }
 
-func (a *Api) AddEndpoint(e *Endpoint) {
+// AddEndpoint adds the specified endpoint to the API definition; to generate an endpoint use ```endpoint.New```
+func (a *API) AddEndpoint(e *Endpoint) {
 	a.addPath(e)
 	a.addDefinition(e)
 }
 
-func (a *Api) Handler(cors bool) http.HandlerFunc {
+// Handler is a factory method that generates an http.HandlerFunc; if enableCors is true, then the handler will generate
+// cors headers
+func (a *API) Handler(enableCors bool) http.HandlerFunc {
 	mux := &sync.Mutex{}
-	byHostAndScheme := map[string]*Api{}
+	byHostAndScheme := map[string]*API{}
 
 	return func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
-		if cors {
+		if enableCors {
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, api_key, Authorization")
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -223,7 +234,8 @@ func (a *Api) Handler(cors bool) http.HandlerFunc {
 	}
 }
 
-func (a *Api) Walk(callback func(path string, endpoints *Endpoint)) {
+// Walk invoke the callback for each endpoints defined in the swagger doc
+func (a *API) Walk(callback func(path string, endpoints *Endpoint)) {
 	for path, endpoints := range a.Paths {
 		u := filepath.Join(a.BasePath, path)
 		endpoints.Walk(func(endpoint *Endpoint) {

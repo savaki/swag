@@ -2,8 +2,9 @@ package swag
 
 import "github.com/savaki/swag/swagger"
 
+// Builder uses the builder pattern to generate a swagger definition
 type Builder struct {
-	Api *swagger.Api
+	API *swagger.API
 }
 
 // Option provides configuration options to the swagger api builder
@@ -12,82 +13,82 @@ type Option func(builder *Builder)
 // Description sets info.description
 func Description(v string) Option {
 	return func(builder *Builder) {
-		builder.Api.Info.Description = v
+		builder.API.Info.Description = v
 	}
 }
 
 // Version sets info.version
 func Version(v string) Option {
 	return func(builder *Builder) {
-		builder.Api.Info.Version = v
+		builder.API.Info.Version = v
 	}
 }
 
 // TermsOfService sets info.termsOfService
 func TermsOfService(v string) Option {
 	return func(builder *Builder) {
-		builder.Api.Info.TermsOfService = v
+		builder.API.Info.TermsOfService = v
 	}
 }
 
 // Title sets info.title
 func Title(v string) Option {
 	return func(builder *Builder) {
-		builder.Api.Info.Title = v
+		builder.API.Info.Title = v
 	}
 }
 
 // ContactEmail sets info.contact.email
 func ContactEmail(v string) Option {
 	return func(builder *Builder) {
-		builder.Api.Info.Contact.Email = v
+		builder.API.Info.Contact.Email = v
 	}
 }
 
 // License sets both info.license.name and info.license.url
 func License(name, url string) Option {
 	return func(builder *Builder) {
-		builder.Api.Info.License.Name = name
-		builder.Api.Info.License.Url = url
+		builder.API.Info.License.Name = name
+		builder.API.Info.License.URL = url
 	}
 }
 
 // BasePath sets basePath
 func BasePath(v string) Option {
 	return func(builder *Builder) {
-		builder.Api.BasePath = v
+		builder.API.BasePath = v
 	}
 }
 
 // Schemes sets the scheme
 func Schemes(v ...string) Option {
 	return func(builder *Builder) {
-		builder.Api.Schemes = v
+		builder.API.Schemes = v
 	}
 }
 
 // TagOption provides additional customizations to the #Tag option
 type TagOption func(tag *swagger.Tag)
 
-// ExternalTagDescription sets externalDocs.description on the tag field
+// TagDescription sets externalDocs.description on the tag field
 func TagDescription(v string) TagOption {
 	return func(t *swagger.Tag) {
 		t.Docs.Description = v
 	}
 }
 
-// ExternalTagUrl sets externalDocs.url on the tag field
-func TagUrl(v string) TagOption {
+// TagURL sets externalDocs.url on the tag field
+func TagURL(v string) TagOption {
 	return func(t *swagger.Tag) {
-		t.Docs.Url = v
+		t.Docs.URL = v
 	}
 }
 
 // Tag adds a tag to the swagger api
 func Tag(name, description string, options ...TagOption) Option {
 	return func(builder *Builder) {
-		if builder.Api.Tags == nil {
-			builder.Api.Tags = []swagger.Tag{}
+		if builder.API.Tags == nil {
+			builder.API.Tags = []swagger.Tag{}
 		}
 
 		t := swagger.Tag{
@@ -99,14 +100,14 @@ func Tag(name, description string, options ...TagOption) Option {
 			opt(&t)
 		}
 
-		builder.Api.Tags = append(builder.Api.Tags, t)
+		builder.API.Tags = append(builder.API.Tags, t)
 	}
 }
 
 // Host specifies the host field
 func Host(v string) Option {
 	return func(builder *Builder) {
-		builder.Api.Host = v
+		builder.API.Host = v
 	}
 }
 
@@ -114,15 +115,15 @@ func Host(v string) Option {
 func Endpoints(endpoints ...*swagger.Endpoint) Option {
 	return func(builder *Builder) {
 		for _, e := range endpoints {
-			builder.Api.AddEndpoint(e)
+			builder.API.AddEndpoint(e)
 		}
 	}
 }
 
 // New constructs a new api builder
-func New(options ...Option) *swagger.Api {
+func New(options ...Option) *swagger.API {
 	b := &Builder{
-		Api: &swagger.Api{
+		API: &swagger.API{
 			BasePath: "/",
 			Swagger:  "2.0",
 			Schemes:  []string{"http"},
@@ -136,7 +137,7 @@ func New(options ...Option) *swagger.Api {
 				TermsOfService: "http://swagger.io/terms/",
 				License: swagger.License{
 					Name: "Apache 2.0",
-					Url:  "http://www.apache.org/licenses/LICENSE-2.0.html",
+					URL:  "http://www.apache.org/licenses/LICENSE-2.0.html",
 				},
 			},
 		},
@@ -146,5 +147,5 @@ func New(options ...Option) *swagger.Api {
 		opt(b)
 	}
 
-	return b.Api
+	return b.API
 }

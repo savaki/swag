@@ -28,7 +28,7 @@ type Empty struct {
 	Nope int `json:"-"`
 }
 
-type ApiResponse struct {
+type APIResponse struct {
 	Code    int    `json:"code"`
 	Type    string `json:"type"`
 	Message string `json:"message"`
