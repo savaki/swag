@@ -97,8 +97,8 @@ func (e *Endpoints) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	switch v:= endpoint.Handler.(type){
-	case func( w http.ResponseWriter, req *http.Request) :
+	switch v := endpoint.Handler.(type) {
+	case func(w http.ResponseWriter, req *http.Request):
 		v(w, req)
 	case http.HandlerFunc:
 		v(w, req)
@@ -258,7 +258,10 @@ func (a *API) Handler(enableCors bool) http.HandlerFunc {
 
 		// customize the swagger header based on host
 		//
-		scheme := req.URL.Scheme
+		scheme := req.Header.Get("X-Forwarded-Proto")
+		if scheme == "" {
+			scheme = req.URL.Scheme
+		}
 		if scheme == "" {
 			scheme = "http"
 		}
