@@ -134,12 +134,13 @@ func New(method, path, summary string, options ...Option) *swagger.Endpoint {
 	method = strings.ToUpper(method)
 	e := &Builder{
 		Endpoint: &swagger.Endpoint{
-			Method:   method,
-			Path:     path,
-			Summary:  summary,
-			Produces: []string{"application/json"},
-			Consumes: []string{"application/json"},
-			Tags:     []string{},
+			Method:      method,
+			Path:        path,
+			Summary:     summary,
+			OperationID: strings.ToLower(method) + camel(path),
+			Produces:    []string{"application/json"},
+			Consumes:    []string{"application/json"},
+			Tags:        []string{},
 		},
 	}
 
