@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"path/filepath"
+
 	"github.com/savaki/swag/swagger"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,6 +20,11 @@ func TestEndpoints_ServeHTTPNotFound(t *testing.T) {
 	e := swagger.Endpoints{}
 	e.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestFilepathJoin(t *testing.T) {
+	assert.Equal(t, "/api", filepath.Join("/", "/api"))
+	assert.Equal(t, "/", filepath.Join("/", "/"))
 }
 
 func TestEndpoints_ServeHTTP(t *testing.T) {
