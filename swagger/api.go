@@ -258,7 +258,13 @@ func (a *API) Handler(enableCors bool) http.HandlerFunc {
 
 		// customize the swagger header based on host
 		//
-		scheme := req.Header.Get("X-Forwarded-Proto")
+		scheme := ""
+		if req.TLS != nil {
+			scheme = "https"
+		}
+		if v := req.Header.Get("X-Forwarded-Proto"); v != "" {
+			scheme = v
+		}
 		if scheme == "" {
 			scheme = req.URL.Scheme
 		}
