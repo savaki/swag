@@ -97,6 +97,7 @@ func Query(name, typ, description string, required bool) Option {
 func Body(prototype interface{}, description string, required bool) Option {
 	p := swagger.Parameter{
 		In:          "body",
+		Name:        "body",
 		Description: description,
 		Schema:      swagger.MakeSchema(prototype),
 		Required:    required,

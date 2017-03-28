@@ -112,6 +112,7 @@ type Model struct {
 func TestBody(t *testing.T) {
 	expected := swagger.Parameter{
 		In:          "body",
+		Name:        "body",
 		Description: "the description",
 		Required:    true,
 		Schema: &swagger.Schema{
