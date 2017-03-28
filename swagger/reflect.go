@@ -191,7 +191,6 @@ func MakeSchema(prototype interface{}) *Schema {
 		}
 
 	} else {
-		schema.Type = "object"
 		schema.Ref = makeRef(obj.Name)
 	}
 
