@@ -115,7 +115,6 @@ func TestBody(t *testing.T) {
 		Description: "the description",
 		Required:    true,
 		Schema: &swagger.Schema{
-			Type:      "object",
 			Ref:       "#/definitions/endpoint_testModel",
 			Prototype: Model{},
 		},
@@ -133,7 +132,6 @@ func TestResponse(t *testing.T) {
 	expected := swagger.Response{
 		Description: "successful",
 		Schema: &swagger.Schema{
-			Type:      "object",
 			Ref:       "#/definitions/endpoint_testModel",
 			Prototype: Model{},
 		},
