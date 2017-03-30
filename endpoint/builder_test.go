@@ -145,3 +145,29 @@ func TestResponse(t *testing.T) {
 	assert.Equal(t, 1, len(e.Responses))
 	assert.Equal(t, expected, e.Responses["200"])
 }
+
+func TestResponseHeader(t *testing.T) {
+	expected := swagger.Response{
+		Description: "successful",
+		Schema: &swagger.Schema{
+			Ref:       "#/definitions/endpoint_testModel",
+			Prototype: Model{},
+		},
+		Headers: map[string]swagger.Header{
+			"X-Rate-Limit": {
+				Type:        "integer",
+				Format:      "int32",
+				Description: "calls per hour allowed by the user",
+			},
+		},
+	}
+
+	e := endpoint.New("get", "/", "get thing",
+		endpoint.Response(http.StatusOK, Model{}, "successful",
+			endpoint.Header("X-Rate-Limit", "integer", "int32", "calls per hour allowed by the user"),
+		),
+	)
+
+	assert.Equal(t, 1, len(e.Responses))
+	assert.Equal(t, expected, e.Responses["200"])
+}

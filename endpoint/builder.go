@@ -116,17 +116,41 @@ func Tags(tags ...string) Option {
 	}
 }
 
+// ResponseOption allows for additional configurations on responses like header information
+type ResponseOption func(response *swagger.Response)
+
+// Header adds header definitions to swagger responses
+func Header(name, typ, format, description string) ResponseOption {
+	return func(response *swagger.Response) {
+		if response.Headers == nil {
+			response.Headers = map[string]swagger.Header{}
+		}
+
+		response.Headers[name] = swagger.Header{
+			Type:        typ,
+			Format:      format,
+			Description: description,
+		}
+	}
+}
+
 // Response sets the endpoint response for the specified code; may be used multiple times with different status codes
-func Response(code int, prototype interface{}, description string) Option {
+func Response(code int, prototype interface{}, description string, opts ...ResponseOption) Option {
 	return func(b *Builder) {
 		if b.Endpoint.Responses == nil {
 			b.Endpoint.Responses = map[string]swagger.Response{}
 		}
 
-		b.Endpoint.Responses[strconv.Itoa(code)] = swagger.Response{
+		r := swagger.Response{
 			Description: description,
 			Schema:      swagger.MakeSchema(prototype),
 		}
+
+		for _, opt := range opts {
+			opt(&r)
+		}
+
+		b.Endpoint.Responses[strconv.Itoa(code)] = r
 	}
 }
 
