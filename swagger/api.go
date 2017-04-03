@@ -17,6 +17,7 @@ type Object struct {
 	GoType     reflect.Type        `json:"-"`
 	Name       string              `json:"-"`
 	Type       string              `json:"type"`
+	Format     string              `json:"format,omitempty"`
 	Required   []string            `json:"required,omitempty"`
 	Properties map[string]Property `json:"properties,omitempty"`
 }
