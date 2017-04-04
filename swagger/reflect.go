@@ -107,6 +107,18 @@ func defineObject(v interface{}) Object {
 		t = t.Elem()
 	}
 
+	if t.Kind() != reflect.Struct {
+		p := inspect(t, "")
+		return Object{
+			IsArray:  isArray,
+			GoType:   t,
+			Type:     p.Type,
+			Format:   p.Format,
+			Name:     t.Kind().String(),
+			Required: required,
+		}
+	}
+
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"fmt"
 )
 
 type Person struct {
@@ -63,6 +64,47 @@ func TestDefine(t *testing.T) {
 		assert.Equal(t, e.Example, v.Example, "expected %v.Required to match", k)
 		assert.Equal(t, e.Items, v.Items, "expected %v.Required to match", k)
 	}
+}
+
+func TestNotStructDefine(t *testing.T) {
+	v := define(int32(1))
+	obj, ok := v["int32"]
+	assert.True(t, ok)
+	assert.False(t, obj.IsArray)
+	assert.Equal(t, "integer", obj.Type )
+	assert.Equal(t, "int32", obj.Format)
+
+	v = define(uint64(1))
+	obj, ok = v["uint64"]
+	assert.True(t, ok)
+	assert.False(t, obj.IsArray)
+	assert.Equal(t, "integer", obj.Type )
+	assert.Equal(t, "int64", obj.Format)
+
+	v = define("")
+	obj, ok = v["string"]
+	assert.True(t, ok)
+	assert.False(t, obj.IsArray)
+	assert.Equal(t, "string", obj.Type )
+	assert.Equal(t, "", obj.Format)
+
+	v = define(byte(1))
+	obj, ok = v["uint8"]
+	if !assert.True(t, ok) {
+		fmt.Printf("%v", v)
+	}
+	assert.False(t, obj.IsArray)
+	assert.Equal(t, "integer", obj.Type )
+	assert.Equal(t, "int32", obj.Format)
+
+	v = define([]byte{1,2})
+	obj, ok = v["uint8"]
+	if !assert.True(t, ok) {
+		fmt.Printf("%v", v)
+	}
+	assert.True(t, obj.IsArray)
+	assert.Equal(t, "integer", obj.Type )
+	assert.Equal(t, "int32", obj.Format)
 }
 
 func TestHonorJsonIgnore(t *testing.T) {
