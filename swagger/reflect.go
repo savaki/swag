@@ -122,6 +122,11 @@ func defineObject(v interface{}) Object {
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 
+		// skip unexported fields
+		if strings.ToLower(field.Name[0:1]) == field.Name[0:1] {
+			continue
+		}
+
 		// determine the json name of the field
 		name := strings.TrimSpace(field.Tag.Get("json"))
 		if name == "" || strings.HasPrefix(name, ",") {
