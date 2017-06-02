@@ -69,3 +69,58 @@ func TestEndpoints_ServeHTTP(t *testing.T) {
 		assert.Equal(t, strings.ToUpper(w.Body.String()), strings.ToUpper(method))
 	}
 }
+
+func TestSecuritySchemeDescription(t *testing.T) {
+	scheme := &swagger.SecurityScheme{}
+	description := "a security scheme"
+	swagger.SecuritySchemeDescription(description)(scheme)
+	assert.Equal(t, description, scheme.Description)
+}
+
+func TestBasicSecurity(t *testing.T) {
+	scheme := &swagger.SecurityScheme{}
+	swagger.BasicSecurity()(scheme)
+	assert.Equal(t, scheme.Type, "basic")
+}
+
+func TestAPIKeySecurity(t *testing.T) {
+	scheme := &swagger.SecurityScheme{}
+	name := "Authorization"
+	in := "header"
+	swagger.APIKeySecurity(name, in)(scheme)
+	assert.Equal(t, scheme.Type, "apiKey")
+	assert.Equal(t, scheme.Name, name)
+	assert.Equal(t, scheme.In, in)
+
+	assert.Panics(t, func() {
+		swagger.APIKeySecurity(name, "invalid")
+	}, "expected APIKeySecurity to panic with invalid \"in\" parameter")
+}
+
+func TestOAuth2Security(t *testing.T) {
+	scheme := &swagger.SecurityScheme{}
+
+	flow := "accessCode"
+	authURL := "http://example.com/oauth/authorize"
+	tokenURL := "http://example.com/oauth/token"
+	swagger.OAuth2Security(flow, authURL, tokenURL)(scheme)
+
+	assert.Equal(t, scheme.Type, "oauth2")
+	assert.Equal(t, scheme.Flow, "accessCode")
+	assert.Equal(t, scheme.AuthorizationURL, authURL)
+	assert.Equal(t, scheme.TokenURL, tokenURL)
+}
+
+func TestOAuth2Scope(t *testing.T) {
+	scheme := &swagger.SecurityScheme{}
+
+	swagger.OAuth2Scope("read", "read data")(scheme)
+	swagger.OAuth2Scope("write", "write data")(scheme)
+
+	assert.Len(t, scheme.Scopes, 2)
+	assert.Contains(t, scheme.Scopes, "read")
+	assert.Contains(t, scheme.Scopes, "write")
+
+	assert.Equal(t, "read data", scheme.Scopes["read"])
+	assert.Equal(t, "write data", scheme.Scopes["write"])
+}

@@ -116,6 +116,28 @@ func Tags(tags ...string) Option {
 	}
 }
 
+// Security allows a security scheme to be associated with the endpoint.
+func Security(scheme string, scopes ...string) Option {
+	return func(b *Builder) {
+		if b.Endpoint.Security == nil {
+			b.Endpoint.Security = &swagger.SecurityRequirement{}
+		}
+
+		if b.Endpoint.Security.Requirements == nil {
+			b.Endpoint.Security.Requirements = []map[string][]string{}
+		}
+
+		b.Endpoint.Security.Requirements = append(b.Endpoint.Security.Requirements, map[string][]string{scheme: scopes})
+	}
+}
+
+// NoSecurity explicitly sets the endpoint to have no security requirements.
+func NoSecurity() Option {
+	return func(b *Builder) {
+		b.Endpoint.Security = &swagger.SecurityRequirement{DisableSecurity: true}
+	}
+}
+
 // ResponseOption allows for additional configurations on responses like header information
 type ResponseOption func(response *swagger.Response)
 

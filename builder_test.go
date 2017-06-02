@@ -90,3 +90,22 @@ func TestHost(t *testing.T) {
 	)
 	assert.Equal(t, "blah", api.Host)
 }
+
+func TestSecurityScheme(t *testing.T) {
+	api := swag.New(
+		swag.SecurityScheme("basic", swagger.BasicSecurity()),
+		swag.SecurityScheme("apikey", swagger.APIKeySecurity("Authorization", "header")),
+	)
+	assert.Len(t, api.SecurityDefinitions, 2)
+	assert.Contains(t, api.SecurityDefinitions, "basic")
+	assert.Contains(t, api.SecurityDefinitions, "apikey")
+	assert.Equal(t, "header", api.SecurityDefinitions["apikey"].In)
+}
+
+func TestSecurity(t *testing.T) {
+	api := swag.New(
+		swag.Security("basic"),
+	)
+	assert.Len(t, api.Security.Requirements, 1)
+	assert.Contains(t, api.Security.Requirements[0], "basic")
+}

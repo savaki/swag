@@ -55,6 +55,74 @@ type Info struct {
 	License        License `json:"license"`
 }
 
+// SecurityScheme represents a security scheme from the swagger definition.
+type SecurityScheme struct {
+	Type             string            `json:"type"`
+	Description      string            `json:"description,omitempty"`
+	Name             string            `json:"name,omitempty"`
+	In               string            `json:"in,omitempty"`
+	Flow             string            `json:"flow,omitempty"`
+	AuthorizationURL string            `json:"authorizationUrl,omitempty"`
+	TokenURL         string            `json:"tokenUrl,omitempty"`
+	Scopes           map[string]string `json:"scopes,omitempty"`
+}
+
+// SecuritySchemeOption provides additional customizations to the SecurityScheme.
+type SecuritySchemeOption func(securityScheme *SecurityScheme)
+
+// SecuritySchemeDescription sets the security scheme's description.
+func SecuritySchemeDescription(description string) SecuritySchemeOption {
+	return func(securityScheme *SecurityScheme) {
+		securityScheme.Description = description
+	}
+}
+
+// BasicSecurity defines a security scheme for HTTP Basic authentication.
+func BasicSecurity() SecuritySchemeOption {
+	return func(securityScheme *SecurityScheme) {
+		securityScheme.Type = "basic"
+	}
+}
+
+// APIKeySecurity defines a security scheme for API key authentication. "in" is
+// the location of the API key (query or header). "name" is the name of the
+// header or query parameter to be used.
+func APIKeySecurity(name, in string) SecuritySchemeOption {
+	if in != "header" && in != "query" {
+		panic(fmt.Errorf(`APIKeySecurity "in" parameter must be one of: "header" or "query"`))
+	}
+
+	return func(securityScheme *SecurityScheme) {
+		securityScheme.Type = "apiKey"
+		securityScheme.Name = name
+		securityScheme.In = in
+	}
+}
+
+// OAuth2Scope adds a new scope to the security scheme.
+func OAuth2Scope(scope, description string) SecuritySchemeOption {
+	return func(securityScheme *SecurityScheme) {
+		if securityScheme.Scopes == nil {
+			securityScheme.Scopes = map[string]string{}
+		}
+		securityScheme.Scopes[scope] = description
+	}
+}
+
+// OAuth2Security defines a security scheme for OAuth2 authentication. Flow can
+// be one of implicit, password, application, or accessCode.
+func OAuth2Security(flow, authorizationURL, tokenURL string) SecuritySchemeOption {
+	return func(securityScheme *SecurityScheme) {
+		securityScheme.Type = "oauth2"
+		securityScheme.Flow = flow
+		securityScheme.AuthorizationURL = authorizationURL
+		securityScheme.TokenURL = tokenURL
+		if securityScheme.Scopes == nil {
+			securityScheme.Scopes = map[string]string{}
+		}
+	}
+}
+
 // Endpoints represents all the swagger endpoints associated with a particular path
 type Endpoints struct {
 	Delete  *Endpoint `json:"delete,omitempty"`
@@ -144,26 +212,30 @@ func (e *Endpoints) Walk(fn func(endpoint *Endpoint)) {
 
 // API provides the top level encapsulation for the swagger definition
 type API struct {
-	Swagger     string                `json:"swagger,omitempty"`
-	Info        Info                  `json:"info"`
-	BasePath    string                `json:"basePath,omitempty"`
-	Schemes     []string              `json:"schemes,omitempty"`
-	Paths       map[string]*Endpoints `json:"paths,omitempty"`
-	Definitions map[string]Object     `json:"definitions,omitempty"`
-	Tags        []Tag                 `json:"tags"`
-	Host        string                `json:"host"`
+	Swagger             string                    `json:"swagger,omitempty"`
+	Info                Info                      `json:"info"`
+	BasePath            string                    `json:"basePath,omitempty"`
+	Schemes             []string                  `json:"schemes,omitempty"`
+	Paths               map[string]*Endpoints     `json:"paths,omitempty"`
+	Definitions         map[string]Object         `json:"definitions,omitempty"`
+	Tags                []Tag                     `json:"tags"`
+	Host                string                    `json:"host"`
+	SecurityDefinitions map[string]SecurityScheme `json:"securityDefinitions,omitempty"`
+	Security            *SecurityRequirement      `json:"security,omitempty"`
 }
 
 func (a *API) clone() *API {
 	return &API{
-		Swagger:     a.Swagger,
-		Info:        a.Info,
-		BasePath:    a.BasePath,
-		Schemes:     a.Schemes,
-		Paths:       a.Paths,
-		Definitions: a.Definitions,
-		Tags:        a.Tags,
-		Host:        a.Host,
+		Swagger:             a.Swagger,
+		Info:                a.Info,
+		BasePath:            a.BasePath,
+		Schemes:             a.Schemes,
+		Paths:               a.Paths,
+		Definitions:         a.Definitions,
+		Tags:                a.Tags,
+		Host:                a.Host,
+		SecurityDefinitions: a.SecurityDefinitions,
+		Security:            a.Security,
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/savaki/swag"
 	"github.com/savaki/swag/endpoint"
 	"github.com/savaki/swag/swagger"
 	"github.com/stretchr/testify/assert"
@@ -170,4 +171,36 @@ func TestResponseHeader(t *testing.T) {
 
 	assert.Equal(t, 1, len(e.Responses))
 	assert.Equal(t, expected, e.Responses["200"])
+}
+
+func TestSecurityScheme(t *testing.T) {
+	api := swag.New(
+		swag.SecurityScheme("basic", swagger.BasicSecurity()),
+		swag.SecurityScheme("apikey", swagger.APIKeySecurity("Authorization", "header")),
+	)
+	assert.Len(t, api.SecurityDefinitions, 2)
+	assert.Contains(t, api.SecurityDefinitions, "basic")
+	assert.Contains(t, api.SecurityDefinitions, "apikey")
+	assert.Equal(t, "header", api.SecurityDefinitions["apikey"].In)
+}
+
+func TestSecurity(t *testing.T) {
+	e := endpoint.New("get", "/", "",
+		endpoint.Handler(Echo),
+		endpoint.Security("basic"),
+		endpoint.Security("oauth2", "scope1", "scope2"),
+	)
+	assert.False(t, e.Security.DisableSecurity)
+	assert.Len(t, e.Security.Requirements, 2)
+	assert.Contains(t, e.Security.Requirements[0], "basic")
+	assert.Contains(t, e.Security.Requirements[1], "oauth2")
+	assert.Len(t, e.Security.Requirements[1]["oauth2"], 2)
+}
+
+func TestNoSecurity(t *testing.T) {
+	e := endpoint.New("get", "/", "",
+		endpoint.Handler(Echo),
+		endpoint.NoSecurity(),
+	)
+	assert.True(t, e.Security.DisableSecurity)
 }
