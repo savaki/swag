@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path/filepath"
+	"path"
 	"reflect"
 	"strings"
 	"sync"
@@ -290,8 +290,8 @@ func (a *API) Handler(enableCors bool) http.HandlerFunc {
 
 // Walk invoke the callback for each endpoints defined in the swagger doc
 func (a *API) Walk(callback func(path string, endpoints *Endpoint)) {
-	for path, endpoints := range a.Paths {
-		u := filepath.Join(a.BasePath, path)
+	for rawPath, endpoints := range a.Paths {
+		u := path.Join(a.BasePath, rawPath)
 		endpoints.Walk(func(endpoint *Endpoint) {
 			callback(u, endpoint)
 		})
