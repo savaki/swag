@@ -134,6 +134,38 @@ func Endpoints(endpoints ...*swagger.Endpoint) Option {
 	}
 }
 
+// SecurityScheme creates a new security definition for the API.
+func SecurityScheme(name string, options ...swagger.SecuritySchemeOption) Option {
+	return func(builder *Builder) {
+		if builder.API.SecurityDefinitions == nil {
+			builder.API.SecurityDefinitions = map[string]swagger.SecurityScheme{}
+		}
+
+		scheme := swagger.SecurityScheme{}
+
+		for _, opt := range options {
+			opt(&scheme)
+		}
+
+		builder.API.SecurityDefinitions[name] = scheme
+	}
+}
+
+// Security sets a default security scheme for all endpoints in the API.
+func Security(scheme string, scopes ...string) Option {
+	return func(b *Builder) {
+		if b.API.Security == nil {
+			b.API.Security = &swagger.SecurityRequirement{}
+		}
+
+		if b.API.Security.Requirements == nil {
+			b.API.Security.Requirements = []map[string][]string{}
+		}
+
+		b.API.Security.Requirements = append(b.API.Security.Requirements, map[string][]string{scheme: scopes})
+	}
+}
+
 // New constructs a new api builder
 func New(options ...Option) *swagger.API {
 	b := &Builder{

@@ -14,6 +14,8 @@
 //
 package swagger
 
+import "encoding/json"
+
 // Items represents items from the swagger doc
 type Items struct {
 	Type   string `json:"type,omitempty"`
@@ -67,4 +69,20 @@ type Endpoint struct {
 	Handler     interface{}         `json:"-"`
 	Parameters  []Parameter         `json:"parameters,omitempty"`
 	Responses   map[string]Response `json:"responses,omitempty"`
+
+	// swagger spec requires security to be an array of objects
+	Security *SecurityRequirement `json:"security,omitempty"`
+}
+
+type SecurityRequirement struct {
+	Requirements    []map[string][]string
+	DisableSecurity bool
+}
+
+func (s *SecurityRequirement) MarshalJSON() ([]byte, error) {
+	if s.DisableSecurity {
+		return []byte("[]"), nil
+	}
+
+	return json.Marshal(s.Requirements)
 }
