@@ -20,8 +20,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"fmt"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type Person struct {
@@ -37,6 +38,8 @@ type Pet struct {
 	IntArray    []int
 	String      string
 	StringArray []string
+
+	unexported string
 }
 
 type Empty struct {
@@ -85,21 +88,21 @@ func TestNotStructDefine(t *testing.T) {
 	obj, ok := v["int32"]
 	assert.True(t, ok)
 	assert.False(t, obj.IsArray)
-	assert.Equal(t, "integer", obj.Type )
+	assert.Equal(t, "integer", obj.Type)
 	assert.Equal(t, "int32", obj.Format)
 
 	v = define(uint64(1))
 	obj, ok = v["uint64"]
 	assert.True(t, ok)
 	assert.False(t, obj.IsArray)
-	assert.Equal(t, "integer", obj.Type )
+	assert.Equal(t, "integer", obj.Type)
 	assert.Equal(t, "int64", obj.Format)
 
 	v = define("")
 	obj, ok = v["string"]
 	assert.True(t, ok)
 	assert.False(t, obj.IsArray)
-	assert.Equal(t, "string", obj.Type )
+	assert.Equal(t, "string", obj.Type)
 	assert.Equal(t, "", obj.Format)
 
 	v = define(byte(1))
@@ -108,16 +111,16 @@ func TestNotStructDefine(t *testing.T) {
 		fmt.Printf("%v", v)
 	}
 	assert.False(t, obj.IsArray)
-	assert.Equal(t, "integer", obj.Type )
+	assert.Equal(t, "integer", obj.Type)
 	assert.Equal(t, "int32", obj.Format)
 
-	v = define([]byte{1,2})
+	v = define([]byte{1, 2})
 	obj, ok = v["uint8"]
 	if !assert.True(t, ok) {
 		fmt.Printf("%v", v)
 	}
 	assert.True(t, obj.IsArray)
-	assert.Equal(t, "integer", obj.Type )
+	assert.Equal(t, "integer", obj.Type)
 	assert.Equal(t, "int32", obj.Format)
 }
 
@@ -127,4 +130,17 @@ func TestHonorJsonIgnore(t *testing.T) {
 	assert.True(t, ok)
 	assert.False(t, obj.IsArray)
 	assert.Equal(t, 0, len(obj.Properties), "expected zero exposed properties")
+}
+
+func TestIgnoreUnexported(t *testing.T) {
+	type Test struct {
+		Exported   string
+		unexported string
+	}
+	v := define(Test{})
+	obj, ok := v["swaggerTest"]
+	assert.True(t, ok)
+	assert.Equal(t, 1, len(obj.Properties), "expected one exposed properties")
+	assert.Contains(t, obj.Properties, "Exported")
+	assert.NotContains(t, obj.Properties, "unexported")
 }
