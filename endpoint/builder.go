@@ -30,6 +30,11 @@ type Builder struct {
 // Option represents a functional option to customize the swagger endpoint
 type Option func(builder *Builder)
 
+// Apply improves the readability of applied options
+func (o Option) Apply(builder *Builder) {
+	o(builder)
+}
+
 // Handler allows an instance of the web handler to be associated with the endpoint.  This can be especially useful when
 // using swag to bind the endpoints to the web router.  See the examples package for how the Handler can be used in
 // conjunction with Walk to simplify binding endpoints to a router
@@ -155,6 +160,11 @@ func NoSecurity() Option {
 // ResponseOption allows for additional configurations on responses like header information
 type ResponseOption func(response *swagger.Response)
 
+// Apply improves the readability of applied options
+func (o ResponseOption) Apply(response *swagger.Response) {
+	o(response)
+}
+
 // Header adds header definitions to swagger responses
 func Header(name, typ, format, description string) ResponseOption {
 	return func(response *swagger.Response) {
@@ -183,7 +193,7 @@ func Response(code int, prototype interface{}, description string, opts ...Respo
 		}
 
 		for _, opt := range opts {
-			opt(&r)
+			opt.Apply(&r)
 		}
 
 		b.Endpoint.Responses[strconv.Itoa(code)] = r
@@ -206,7 +216,7 @@ func New(method, path, summary string, options ...Option) *swagger.Endpoint {
 	}
 
 	for _, opt := range options {
-		opt(e)
+		opt.Apply(e)
 	}
 
 	return e.Endpoint
