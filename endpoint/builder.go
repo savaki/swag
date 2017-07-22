@@ -16,6 +16,7 @@ package endpoint
 
 import (
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -113,15 +114,22 @@ func Query(name, typ, description string, required bool) Option {
 
 // Body defines a body parameter for the swagger endpoint as would commonly be used for the POST, PUT, and PATCH methods
 // prototype should be a struct or a pointer to struct that swag can use to reflect upon the return type
-func Body(prototype interface{}, description string, required bool) Option {
+// t represents the Type of the body
+func BodyType(t reflect.Type, description string, required bool) Option {
 	p := swagger.Parameter{
 		In:          "body",
 		Name:        "body",
 		Description: description,
-		Schema:      swagger.MakeSchema(prototype),
+		Schema:      swagger.MakeSchema(t),
 		Required:    required,
 	}
 	return parameter(p)
+}
+
+// Body defines a body parameter for the swagger endpoint as would commonly be used for the POST, PUT, and PATCH methods
+// prototype should be a struct or a pointer to struct that swag can use to reflect upon the return type
+func Body(prototype interface{}, description string, required bool) Option {
+	return BodyType(reflect.TypeOf(prototype), description, required)
 }
 
 // Tags allows one or more tags to be associated with the endpoint
@@ -180,8 +188,9 @@ func Header(name, typ, format, description string) ResponseOption {
 	}
 }
 
-// Response sets the endpoint response for the specified code; may be used multiple times with different status codes
-func Response(code int, prototype interface{}, description string, opts ...ResponseOption) Option {
+// ResponseType sets the endpoint response for the specified code; may be used multiple times with different status codes
+// t represents the Type of the response
+func ResponseType(code int, t reflect.Type, description string, opts ...ResponseOption) Option {
 	return func(b *Builder) {
 		if b.Endpoint.Responses == nil {
 			b.Endpoint.Responses = map[string]swagger.Response{}
@@ -189,7 +198,7 @@ func Response(code int, prototype interface{}, description string, opts ...Respo
 
 		r := swagger.Response{
 			Description: description,
-			Schema:      swagger.MakeSchema(prototype),
+			Schema:      swagger.MakeSchema(t),
 		}
 
 		for _, opt := range opts {
@@ -198,6 +207,11 @@ func Response(code int, prototype interface{}, description string, opts ...Respo
 
 		b.Endpoint.Responses[strconv.Itoa(code)] = r
 	}
+}
+
+// Response sets the endpoint response for the specified code; may be used multiple times with different status codes
+func Response(code int, prototype interface{}, description string, opts ...ResponseOption) Option {
+	return ResponseType(code, reflect.TypeOf(prototype), description, opts...)
 }
 
 // New constructs a new swagger endpoint using the fields and functional options provided

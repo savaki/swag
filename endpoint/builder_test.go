@@ -19,6 +19,8 @@ import (
 	"net/http"
 	"testing"
 
+	"reflect"
+
 	"github.com/savaki/swag"
 	"github.com/savaki/swag/endpoint"
 	"github.com/savaki/swag/swagger"
@@ -132,7 +134,7 @@ func TestBody(t *testing.T) {
 		Required:    true,
 		Schema: &swagger.Schema{
 			Ref:       "#/definitions/endpoint_testModel",
-			Prototype: Model{},
+			Prototype: reflect.TypeOf(Model{}),
 		},
 	}
 
@@ -149,7 +151,7 @@ func TestResponse(t *testing.T) {
 		Description: "successful",
 		Schema: &swagger.Schema{
 			Ref:       "#/definitions/endpoint_testModel",
-			Prototype: Model{},
+			Prototype: reflect.TypeOf(Model{}),
 		},
 	}
 
@@ -166,7 +168,7 @@ func TestResponseHeader(t *testing.T) {
 		Description: "successful",
 		Schema: &swagger.Schema{
 			Ref:       "#/definitions/endpoint_testModel",
-			Prototype: Model{},
+			Prototype: reflect.TypeOf(Model{}),
 		},
 		Headers: map[string]swagger.Header{
 			"X-Rate-Limit": {
